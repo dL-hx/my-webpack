@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[1],[,function(e,n,d){"use strict";d.r(n),n.default=function(){var e=document.createElement("div");e.innerHTML="Dell, Lee",document.body.appendChild(e)}}]]);
+//# sourceMappingURL=1.js.map

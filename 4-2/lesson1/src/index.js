@@ -1,0 +1,4 @@
+// Tree Shaking 只支持ES Module
+import {add} from './math';
+
+add(1, 7);

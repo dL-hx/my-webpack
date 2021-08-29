@@ -1,0 +1,4419 @@
+> https://blog.csdn.net/u013210620/article/details/83069379
+> https://www.cnblogs.com/wzndkj/category/1441873.html
+## 一 基本概念
+## 安装 webpack
+
+npm init 
+> 初始化package.json 文件  
+
+npm install webpack-cli --save-dev
+> 安装webpack脚手架工具
+
+npm install webpack --save
+> 安装webpack
+>
+## npx webpack index.js 
+> 使用webpack 翻译 index.js 文件
+使用webpack 确保 如下代码被翻译为浏览器可以识别的代码
+``` js
+import Header from './header'
+import Sidebar from './Sidebar'
+import Content from './Content'
+
+```
+
+## 总结
+webpack 是文件的打包工具
+
+webpack 模块打包工具
+// js-> 模块打包工具
+
+// 打包css 文件
+// 打包img 文件
+// import style from './index.css'
+// import img from './index.png'
+
+
+## 二 搭建webpack 环境配置
+## 2.1 webpack 的安装使用
+## 修改package.json 文件
+
+{
+  "name": "webpack-demo",
+  "version": "1.0.0",
+  "description": "",
+  + "private": true, // 私有项目, 不会被发布到npm 的线上 
+  - "main": "index.js", // 项目的主目录,  表示向外部暴露文件 index.js
+    "scripts": { //脚本命令, 不需要可以删除 或者新增
+    "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "", // 作者
+    "license": "ISC" // 如果需要开源, 修改"license": "MIT"
+}
+
+### 修改如下
+{
+  "name": "webpack-demo",
+  "version": "1.0.0",
+  "description": "",
+  "private": true, 
+  "scripts": {
+    
+  },
+  "author": "Tffans",
+  "license": "ISC"
+}
+
+## 安装webpack 环境命令
+### 全局安装 webpack
+> npm install webpack webpack-cli -g
+>
+>如果遇到npm 源被墙,  设置 `淘宝镜像地址` 或者 使用 `cnpm` 安装 , 或`代理(翻墙)`
+
+### 卸载webpack
+> npm uninstall webpack webpack-cli -g
+
+### 在项目中安装 webpack 方式(推荐)
+> npm install webpack webpack-cli --save-dev
+> 或者 使用 -D (-D 命令等价于 --save-dev)
+> npm install webpack webpack-cli -D
+
+### 全局命令,与本地命令的区别
+> webpack -v
+> 全局webpack 包 版本
+>
+>
+> npx webpack -v(推荐)
+> 在项目中 运行webpack 包 版本
+>
+### 查看第三方包的信息
+> npm info webpack 
+### 安装指定版本的 webpack 方式(@)
+安装 4.41.5 版本
+> npm install webpack@4.41.5 webpack-cli -D
+
+### 安装依赖包
+> npm install
+
+? 思考
+webpack 打包 图片文件 和js 文件的方式不同?
+webpack 如何找到项目的主文件的路径?
+默认的主文件的路径是什么?
+如何设置webpack 配置文件?
+
+## 2.2 webpack 的默认配置文件(webpack.common.js)
+webpack.common.js
+```javascript
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    entry: './index.js',// 项目的入口文件
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+然后在项目的根目录运行,如下命令
+> npx webpack
+
+可以看到生成了dist 文件, 文件夹中有打包好的js (bundle.js)
+
+当运行`npx webpack` 命令时
+webpack 会去寻找 项目中的配置文件(webpack.common.js), 查看入口和输出的文件及输出文件的名称, 
+然后输出 相应的 打包的代码
+
+## 2.3 使用不同的配置文件
+> 使用其他文件作为webpack 的配置文件
+
+> 如果出于某些原因要根据特定情况使用不同的配置文件，可以使用--config标志通过命令行更改此配置文件。
+Use different config file
+
+If for some reason you want to use different config file depending on certain situations you can change this via command line by using the --config flag.
+```package.json
+"scripts": {
+  "build": "webpack --config prod.config.js" // 修改打包命令为 , 以 prod.config.js 作为 webpack 的配置文件
+}
+```
+
+## 2.4 优化代码结构
+> 1. 新建src 文件, 
+> 2. 将 content.js, header.js,index.js, sidebar.js 文件放到src 文件目录下
+> 3. 修改webpack.config.js 配置文件路径为 `./src/index.js`
+webpack.common.js
+ ```
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
++   entry: './src/index.js',// 项目的入口文件
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+ ```
+> 4. 再次执行如下命令
+> npx webpack
+
+## 2.5 简化打包代码(npm script)
+> 使用npm script 简化打包代码
+``` package.json
+{
+  "name": "webpack-demo",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "bundle": "webpack" // 新增命令脚本
+  },
+  "author": "Tffans",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  }
+}
+```
+> 在命令行 运行如下命令, 进行打包
+> npm run bundle
+>
+>
+>
+## 总结
+global
+--
+webpack index.js
+
+local
+--
+npm webpack index.js
+
+npm run bundle
+
+webpack-cli 作用?
+使得我们可以在命令行中使用 `webpack` 这个命令
+> 可以在命令行中使用 webpack index.js
+>
+`` webpack.common.js
+module.exports = {
+    mode:'development', // 指定打包模式为 development|production 版本, development:未压缩, production:压缩版本
+    entry: './src/index.js',// 项目的入口文件
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+``
+
+## 三 打包静态资源
+
+## 3.1 配置loader
+### 什么是loader
+webpack 不能识别非js 结尾的文件, 需要通过loader,让webpack 识别出来, 
+要让webpack识别需要去配置 相应的loader
+,新建module -> rules 属性 (配置模块打包规则)
+### webpack 的配置项
+> module -> rules 属性 (配置模块打包规则)
+
+### 3.1.1 打包图片(file-loader)
+#### 1 安装file-loader(loader)
+>npm install file-loader --save-dev
+
+#### 2 webpack.common.js 添加 module 的配置
+> 然后将加载程序添加到您的webpack配置中。例如：
+``` webpack.common.js
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode:'development',
+    entry: './src/index.js',// 项目的入口文件
+   + module: {
+   +     rules: [// 其中包含各种loader的使用规则
+   +         {
+   +             test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+   +             use:  {
+   +                 loader: 'file-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+   +                 options:{
+   +                     // placeholder 占位符
+   +                     name:'[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+   +                     outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+   +                 }
+   +             },
+   +         },
+   +     ],
+   + },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+运行 `npm run bundle` 命令后可以看到 图片被打包到: dist/images 
+
+
+### 3.1.2 打包图片(url-loader)
+#### 1 安装url-loader(loader)
+>npm install url-loader --save-dev
+
+#### 2 webpack.common.js 添加 module 的配置
+> 然后将加载程序添加到您的webpack配置中。例如：
+``` webpack.common.js
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode:'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use:  {
+        +            loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options:{
+                        // placeholder 占位符
+                        name:'[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                    }
+                },
+            },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+运行 `npm run bundle` 命令后可以看到 图片被打包到: dist/images 
+
+会将图片转换为base64 格式的图片, 加载到js文件中, 导致 `bundle.js` 文件很大, 所以网站打开时,
+会很慢,
+优点: 减少了一次 图片的 http请求
+缺点: `.js` 文件很大
+
+### 3.1.3 打包图片(url-loader) (推荐)
+? 添加配置参数, 使得小图片以base64 方式存在于 `bundle.js` 文件中
+减少http 请求次数, 大图片以file-loader 方式进行打包
+
+#### 4 添加配置参数(  limit: 2048, ( bytes ))
+2048, ( bytes) => 2kb
+大于(或等于) 2kb 图片会被打包到 images 文件夹下
+#### 2 webpack.common.js 添加 module 的配置
+> 然后将加载程序添加到您的webpack配置中。例如：
+``` webpack.common.js
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode:'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use:  {
+                  +  loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options:{
+                        // placeholder 占位符
+                        name:'[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                  +     limit:10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+运行 `npm run bundle` 命令后可以看到 
+
+当图片大小 大于(或等于) 10 kb 图片会被 打包到: dist/images 
+小于 10 kb 图片会以base64 方式 打包到 `bundle.js` 文件中
+
+实际上, url-loader 和 file-loader 很相似,  url-loader 比 file-loader
+多了一个配置项 `limit` 参数, 可以让 小图片以 base64 方式 打包, 
+大图片以 file (文件) 形式打包
+
+## 3.2  打包静态资源
+
+### 3.2.1  打包静态资源(css)
+#### 1 安装css-loader 和 style-loader (loader)
+>npm install --save-dev css-loader
+>npm install --save-dev style-loader
+
+#### 2 webpack.common.js 添加 module 的配置
+``` javascript
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode:'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use:  {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options:{
+                        // placeholder 占位符
+                        name:'[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit:10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+          +  {
+          +      test: /\.css$/i,
+          +      use: ['style-loader', 'css-loader'],
+          +  },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+
+css-loader 作用 ,
+像官网所说解析css代码中的url、@import语法像import和require一样去处理css里面引入的模块
+
+style-loader作用 ,
+> js 动态加载
+会把样式代码 通过js 添加到 index.html 的head 标签中的style 标签中,
+在浏览器运行时, 会发现, head 标签 中包含 style 标签
+> 会把 css-loader 的样式, 挂载到head 标签中
+>
+所以: css 打包, style-loader 要配合 css-loader 来使用
+
+### 3.2.2  打包静态资源(scss)
+? 想让我们的项目支持, sass , css 文件的新的写法, 需要配置这种 文件的相应的loader
+这里安装 , sass-loader
+
+#### 1 安装sass-loader 和 node-sass (loader)
+>npm install sass-loader node-sass --save-dev
+
+#### 2 webpack.common.js 添加 module 的配置
+```scss
+body {
+  .avatar{
+    width: 150px;
+    height: 150px;
+  }
+}
+```
+```javascript
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode: 'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.scss$/i, // 支持打包scss 文件
+                use: ['style-loader', 'css-loader', 'sass-loader'],
+            },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+### 3.2.3  自动添加 兼容浏览器的前缀
+
+```scss
+body {
+  .avatar{
+    width: 150px;
+    height: 150px;
+    transform: translate(100px, 100px); /*图片偏移 100px, 100px*/
+  }
+}
+```
+
+? 希望在写css 时候添加,兼容各大浏览器厂商的前缀
+
+#### 1 安装postcss-loader 和 autoprefixer 插件
+>npm i postcss-loader -D
+>npm i autoprefixer -D
+#### 2 webpack.common.js 添加 module 的配置
+``` javascript
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode: 'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.scss$/i,
+          +      use: ['style-loader', 'css-loader', 'sass-loader','postcss-loader'],
+            },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+#### 3 创建 postcss.config.js
+``` javascript
++ const autoprefixer = require('autoprefixer');
++ module.exports = {
++     plugins: [
++         autoprefixer
++     ]
++ };
+```
+
+再次打包后 可以看到浏览器中自动添加了 -web-kit 的兼容的代码
+``` css
+body .avatar {
+  width: 150px;
+  height: 150px;
+  -webkit-transform: translate(100px, 100px);
+  transform: translate(100px, 100px); 
+}
+```
+
+#### 补充知识
+在 style.scss 中 引入 新的scss 文件, 
+那么就要去修改 webpack.common.js 的css 配置
+``` scss
+@import "./avatar.scss";
+
+body {
+  .avatar {
+    width: 150px;
+    height: 150px;
+    transform: translate(100px, 100px);
+  }
+}
+```
+
+webpack.common.js
+``` javascript
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode: 'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.scss$/i,
+                use: [
+                    'style-loader',
+               +     {
+               +         loader: 'css-loader',
+               +         options: {
+               +             importLoaders:2
+               +         }
+               + },
+                    'sass-loader',
+                    'postcss-loader'
+                ],
+            },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+注: 
+这里的importLoaders: 2 是在css-loader 之后指定2个数量的loader（即 postcss-loader）来处理import进来的资源
+
+
+在index.js里面引入style.scss，webpack在打包的时候，
+先去执行postcss-loader，然后执行scss-loader，css-loader,style-loader。
+但是在style.scss里面遇到avatar.scss的时候，就不再去执行postcss-loader了。
+而是执行scss-loader了，那如果写上这个配置
+importLoaders: 2
+那么还会从下到上执行postcss-loader,scss-loader...。所以这个就能保证，我在哪引用都没有问题。
+
+修改完成后, 再次打包, 此时支持scss 文件的 导入
+
+
+
+---
+接下来我们了解下css的模块化
+createAvatar.js
+```javascript
+import avatar from './avatar.jpg';
+function createAvatar() {
+    var img = new Image();
+    img.src = avatar;
+    img.classList.add('avatar'); // 让img 元素 添加 avatar 的样式
+    var root = document.getElementById('root');
+    root.append(img);
+}
+
+export default createAvatar
+
+```
+
+index.js
+```javascript
+import avatar from './avatar.jpg';
+import createAvatar from './createAvatar';
+import './style.scss'
+
+createAvatar()
+
+var img = new Image();
+img.src = avatar;
+img.classList.add('avatar'); // 让img 元素 添加 avatar 的样式
+// img.className = 'avatar'
+
+var root = document.getElementById('root');
+root.append(img);
+
+```
+
+
+这样我们打包出来，会看到两张图片，而且样式都是一样的。
+这个我们要说明一个什么问题呢。在index.js里面引入的index.css会作用于当前页面的img标签，
+还会作用于createAvatar里面的img标签，这么写，这个样式是全局的，
+这样很容易引起样式冲突的问题。这个时候我们就引入了一个概念，css module的概念，
+css模块化的概念，什么意思呢，就是这个css样式只作用于当前页面。
+
+
+加一个modules的配置，在引入css的地方改成这样
+
+
+webpack.common.js
+``` javascript
+const path = require('path');// node 中的核心模块 path
+
+module.exports = {
+    mode: 'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.scss$/i,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders:2,
+                   +         modules:true // 加一个modules的配置，在引入css的地方改成这样
+                        }
+                    },
+                    'sass-loader',
+                    'postcss-loader'
+                ],
+            },
+        ],
+    },
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+index.js
+```javascript
+import avatar from './avatar.jpg';
+import style from './index.scss';
+import createAvatar from './createAvatar';
+
+createAvatar();
+
+var img = new Image();
+img.src = avatar;
+img.classList.add(style.avatar);
+
+var root = document.getElementById('root');
+root.appendChild(img);
+
+```
+
+
+打包运行会发现一个是什么样式都没有，一个是有样式的，这样就能保证只有这个文件有对应的样式。
+如果想要createAvatar也有样式，那么在createAvatar里面也引入
+
+createAvatar.js
+```javascript
+import avatar from './avatar.jpg';
+import style from './index.scss';
+
+function createAvatar() {
+　　var img = new Image();
+　　img.src = avatar;
+　　img.classList.add(style.avatar);
+
+　　var root = document.getElementById('root');
+　　root.appendChild(img);
+}
+
+export default createAvatar;
+```
+
+这样又有样式了，这样带来的语法好处是，
+我这个文件的样式和其它文件的样式不会有耦合，冲突，相对独立。
+
+
+---
+打包字体文件
+
+? 那么如何使用webpack,打包字体文件,src目录下一个font文件夹，放着字体的格式
+
+index.js
+``` javascript
+var root = document.getElementById('root');
+import './style.scss'
+
+root.innerHTML = '<div class="iconfont icon-changjingguanli">abc</div>';
+```
+
+style.scss
+``` scss
+@font-face {
+  font-family: "iconfont";
+  src: url('./font/iconfont.eot?t=1543245201565'); /* IE9*/
+  src: url('./font/iconfont.eot?t=1543245201565#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff;charset=utf-8;base64,d09GRgABAAAAAAUUAAsAAAAAB+gAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABHU1VCAAABCAAAADMAAABCsP6z7U9TLzIAAAE8AAAARAAAAFZB101UY21hcAAAAYAAAABRAAABfpko8ApnbHlmAAAB1AAAAT4AAAHEQ6PMXmhlYWQAAAMUAAAALwAAADYTY6EfaGhlYQAAA0QAAAAcAAAAJAfeA4RobXR4AAADYAAAAAwAAAAMDAAAAGxvY2EAAANsAAAACAAAAAgAfgDibWF4cAAAA3QAAAAfAAAAIAESAGBuYW1lAAADlAAAAUUAAAJtPlT+fXBvc3QAAATcAAAANwAAAEtetkw6eJxjYGRgYOBikGPQYWB0cfMJYeBgYGGAAJAMY05meiJQDMoDyrGAaQ4gZoOIAgCKIwNPAHicY2BkYWCcwMDKwMHUyXSGgYGhH0IzvmYwYuRgYGBiYGVmwAoC0lxTGBxeJ75OYm7438AQw9zA0AAUZgTJAQDtMgyweJztkLkNgEAMBMc+Q4Aog4CAYojIufYp4vBDGaw0I+3KkYEJaM7hGMiFEDl9ldwbS+7GljcW+9PHcN9h75ZW18yfNb1/TeNPRX2uQF/bKQ21AAAAeJxtkL9Kw1AUxs/JpSlCuZLb9BZJSJM0TS1CqGl6Mvl/kA6C4OLYxRdwcBG0g8/g4pJH8BG6OAo+Qh2dfIJGb2JrpbicP9/v44NzoALw9caeWR82oQUDOIALAPQ4Vg0Hm94+pkaEzNTbnh8OjYQGXiwbqefrpixHw5QxDQvPUqMkxH+4dp6Pe4RIPczKviF4PuZCcMy4GK9GYQukj3xW7q6qGK9Bra9S/qbl+Mv5TFlWyT2avxeCLbRsDQAwdfuUZewQdiCBPYCOr1c7lHRTOVCHR9hVb5DNaoRtrjlIaUVvqKeUiDlo6n6YUD3ChGJp6sx1YpF/1sVrK6QR4oiKyl/s0+7xVXv3+q6PlrZQR49WEFAQ3P606ZZ82r7sPDSWmFzr3nbwbHJzYkRZrbbM046w8FMwx8UAAN9e80/ZAAB4nGNgZGBgAGJjl5PM8fw2Xxm4WRhA4IaS3kQE/f8ACwOzA5DLwcAEEgUA714IdgB4nGNgZGBgbvjfwBDDwgACQJKRARUwAwBHCQJsBAAAAAQAAAAEAAAAAAAAAAB+AOJ4nGNgZGBgYGYIYWBlAAEmIOYCQgaG/2A+AwARQgFzAHicZY9NTsMwEIVf+gekEqqoYIfkBWIBKP0Rq25YVGr3XXTfpk6bKokjx63UA3AejsAJOALcgDvwSCebNpbH37x5Y08A3OAHHo7fLfeRPVwyO3INF7gXrlN/EG6QX4SbaONVuEX9TdjHM6bCbXRheYPXuGL2hHdhDx18CNdwjU/hOvUv4Qb5W7iJO/wKt9Dx6sI+5l5XuI1HL/bHVi+cXqnlQcWhySKTOb+CmV7vkoWt0uqca1vEJlODoF9JU51pW91T7NdD5yIVWZOqCas6SYzKrdnq0AUb5/JRrxeJHoQm5Vhj/rbGAo5xBYUlDowxQhhkiMro6DtVZvSvsUPCXntWPc3ndFsU1P9zhQEC9M9cU7qy0nk6T4E9XxtSdXQrbsuelDSRXs1JErJCXta2VELqATZlV44RelzRiT8oZ0j/AAlabsgAAAB4nGNgYoAALgbsgJmRiZGZkYWBPzkjMS89KzMvPb00MS8nkz8tNa8iEyiUBsTFGZkMDADmWgyTAA==') format('woff'),
+  url('./font/iconfont.ttf?t=1543245201565') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('./font/iconfont.svg?t=1543245201565#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family:"iconfont" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-changjingguanli:before { content: "\eb61"; }
+
+.icon-fenxiangfangshi:before { content: "\eb62"; }
+
+```
+
+这样理论上没有什么问题，运行 npm run bundle。发现报错了，报什么错呢
+
+![font-build-err](https://img2018.cnblogs.com/blog/331769/201904/331769-20190421081618322-419351155.png)
+
+如图，他说字体不知道如何打包，这是为什么呢，在执行引入字体文件的时候，webpack不知道如何打包，这个时候借助于file-loader打包
+
+webpack.common.js
+``` javascript
+module: {
+　　+ rules: [{
+　　+ 　　test: /\.eot|ttf|svg|woff$/,
+　　+ 　　use: {
+　　+ 　　　　loader: 'file-loader'
+　　+ 　　}
+　　+ }]
+},
+```
+
+再重新运行npm run bundle，就没有报错了，页面上对应的字体内容也显示出来了。
+
+
+## 3.3 使用plugins让打包更便捷
+之前运行dist下的js，都是手动把index.html拷贝过去的，每次把dist文件夹删除，都需要将index.html拷贝进去，这样很麻烦，我们在webpack官方插件中找到
+`HtmlWebpackPlugin`
+
+#### 1 安装HtmlWebpackPlugin插件
+>npm install --save-dev html-webpack-plugin
+
+#### 2 webpack.common.js 添加 module 的配置
+``` javascript
+const path = require('path');// node 中的核心模块 path
++ var HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+   */
+    mode: 'development',
+    entry: './src/index.js',// 项目的入口文件
+    module: {...},
+
+  + plugins: [new HtmlWebpackPlugin()],
+
+    output: {...},
+};
+```
+这样配置好，再去打包，发现会自动生成一个index.html，
+index.html
+```html
+<!DOCTYPE html>
+<html>
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<title>Webpack App</title>
+　　</head>
+<body>
+　　<script type="text/javascript" src="bundle.js"></script></body>
+</html>
+```
+
+html里面还引入了bundle.js。而且在src里面我并没有这个index.html.这就是webpack里面插件的作用
+
+HtmlWebpackPlugin这个插件能干什么呢？HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+我们再打开index.html，发现网页上什么也没有。为什么呢？
+
+我们看自己的代码逻辑
+index.js
+```javascript
+var root = document.getElementById('root');
+import './index.scss';
+
+root.innerHTML = '<div class="iconfont iconfangdajing">abc</div>';
+```
+代码逻辑是找到id为root到节点，再把abc挂在到root上。但是我们看index.html并没有root这个标签。所以说明用webpack生成到这个html，少了一个id为root的标签。那我想让他自动生成这个id为root的标签，怎么办，可以对这个html-webpack-plugin做一个配置
+``` webpack.common.js
+plugins: [new HtmlWebpackPlugin({
+　　template: 'src/index.html'
+})],
+```
+然后在src里面自己写一个模版index.html
+src/index.html
+``` html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+然后运行npm run bundle，打开自动生成的html
+```
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　　　<script type="text/javascript" src="bundle.js"></script>
+　　</body>
+</html>
+```
+
+
+可以惊讶的看到id为root的标签插入进去了。这是为什么呢？
+
+
+html-webpack-plugin会自动生成一个html，这个html是以哪个模版生成的呢，是src下面的index.html为模板生成的。生成之后，会把打包出来bundle.js注入到html中。
+ 
+
+通过这个例子，我们说明一下webpack中plugin的作用。
+plugin可以在webpack运行到某个时刻的时候，帮你做一些事情。这个很像生命周期函数的定义。这个时刻是什么时刻呢，就是webpack打包结束的时刻。其它的插件也会在某些时刻做一些事情，比如刚打包的时刻。比如打包js的某个时刻。再举个例子。。
+ 
+
+我们现在打包好的名字叫bundle.js，现在我改一下，叫做dist.js
+webpack.common.js
+
+``` javascript
+output: {
+　　filename: 'dist.js',
+　　path: path.resolve(__dirname, 'dist')
+}
+```
+然后重新打包，然后dist目录下会多出一个dist.js文件，
+html里面自动引入的也是dist.js文件。
+但是我们看bundle.js的文件依然存在，为什么呀，
+一个是我们刚才没有删除dist，再打包，但每次打包都需要删除一下，会很麻烦。
+我们希望每次打包的时候，自动将dist删除，这样就不会有上次遗留的东西了。
+现在就需要另外一个插件，在官网webpack下找到，叫做clean-webpack-plugin
+#### 3 安装clean-webpack-plugin插件
+> npm install clean-webpack-plugin -D
+> 作用: 清除遗留的旧的打包代码了
+
+装好之后，我们去增加配置
+#### 4 webpack.common.js 添加 module 的配置
+``` javascript
+  const path = require('path');
+  const HtmlWebpackPlugin = require('html-webpack-plugin');
++ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+  module.exports = {
+    entry: {
+      app: './src/index.js',
+      print: './src/print.js',
+    },
+...
+    plugins: [
+       new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
++       new CleanWebpackPlugin()
+    ],
+    output: {
+      filename: '[name].bundle.js',
+      path: path.resolve(__dirname, 'dist'),
+    },
+  };
+```
+这个意思是在打包之前先删除掉dist这个文件夹。这样运行npm run bundle，之前bundle.js就不在了。
+
+
+## 3.4 webpack中Entry与Output的基础配置
+entry顾名思义，就是打包的入口文件
+webpack.common.js
+
+``` javascript
+module.exports = {
+　　// 这个文件要做打包，从哪一个文件开始打包
+　　entry: './src/index.js',
+
+　　// 打包文件要放到哪里去，就配置在output这个对象里
+　　output: {
+　　　　// 打包好的文件名字
+　　　　filename: 'bundle.js',
+　　　　/**
+　　　　* 打包出的文件要把他放到哪一个文件夹下，path后面要放一个绝对路径
+　　　　* __dirname指的是webpack.config.js所在的当前目录的这个路径
+　　　　* 下面这个结合就是一个绝对路径
+　　　　*/
+　　　　path: path.resolve(__dirname, 'dist')
+　　}
+}
+```
+
+其中，
+```javascript
+entry: './src/index.js'
+```
+
+等同于
+```javascript
+entry: {
+　　main: './src/index.js'
+}
+```
+打包生成的文件，默认的名字叫main。打包生成的文件叫做bundle.js，
+``` javascript
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名 ,默认为 main.js 
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+```
+如果我把这个自定义的打包好的名字去掉。那么打包生成的名字是什么，是main.js。
+所以这个名字，就是打包生成的名字。
+
+
+现在我有一个需求，我希望，这个index.js，反复生成两次，
+第一个文件叫做main，第二个文件叫做sub。
+打包生成的名字还是叫bundle
+
+``` javascript
+const path = require('path');// node 中的核心模块 path
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     */
+    mode: 'development',
+    entry: {
+        main: './src/index.js',// 项目的入口文件
+        sub:'./src/index.js'
+    },
+    module: {...},
+
+    plugins: [...],
+    output: {
+        filename: 'bundle.js', // 打包后的js  的文件名
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+这个时候会报错，如图。
+
+![sub_main_js_err](https://img2018.cnblogs.com/blog/331769/201904/331769-20190421162330059-2013726563.png)
+
+为什么呢？现在要用index.js生成两个文件，
+**一个叫做main,一个叫sub，但是这两个文件最终都会被取名叫做bundle.js。**
+这样取名就重复了。就冲突了，想要解决这个问题，我们把filename替换成一个占位符
+
+webpack.common.js
+```javascript
+output: {
+　　// 打包好的文件名字
+　　filename: '[name].bundle.js',
+　　path: path.resolve(__dirname, 'dist')
+}
+```
+
+这个就是打包相应的名字
+
+但是一般我们做好的项目都会上传到线上，
+
+## 3.5 将js 文件放到CDN 上的可选配置项
+> 　　publicPath: 'http://cdn.com.cn',
+
+域名下到文件，这个时候自动生成的index.html里面的js路径不是我想要到，
+我想要在路径前面加上域名
+
+index.html
+```html
+<script type="text/javascript" src="main.bundle.js"></script>
+<script type="text/javascript" src="sub.bundle.js"></script>
+```
+
+这个自动插入的js想变成这样
+```html
+<script type="text/javascript" src="http://cdn.com/main.bundle.js"></script>
+<script type="text/javascript" src="http://cdn.com/sub.bundle.js"></script>
+```
+
+我们可以在webpack里面配置一个内容
+webpack.common.js
+``` javascript
+output: {
+　　publicPath: 'http://cdn.com.cn',
+　　filename: '[name].bundle.js',
+　　path: path.resolve(__dirname, 'dist')
+}
+```
+
+再去运行 npm run bundle。生成index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+    　　　　<meta charset="UTF-8">
+    　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+    　　　　<title>html template</title>
+    　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　<script type="text/javascript" src="http://cdn.com.cn/main.bundle.js"></script><script type="text/javascript" src="http://cdn.com.cn/sub.bundle.js"></script></body>
+</html>
+```
+
+会发现自动带了域名
+
+
+## 3.6 webpack中SourceMap的配置
+> devtool配置: https://webpack.js.org/configuration/devtool/
+
+希望在开发的时候，不要告诉我压缩文件哪一行代码出错了，而是告诉我具体的哪个文件，哪行js代码出错了。
+ 
+
+什么是SourceMap?
+现在知道dist目录下main.js文件96行出错
+sourceMap 它是一个映射关系，他知道dist目录下main.js文件96行，实际上对应的是src目录下index.js的第一行。
+当前其实是index.js的第一行
+
+
+配置，其实webpack默认是把sourceMap配置进去了，去掉SourceMap
+
+```javascript
+module.exports = {
+　　mode: 'development',
+　　// 默认sourceMap配置进去了，所以先把sourceMap把他关掉
+　　devtool: 'none'
+}
+```
+加上SourceMap配置
+```javascript
+module.exports = {
+　　mode: 'development',
+　　devtool: 'inline-source-map'
+}
+```
+用inline的时候js.map文件会变成base64的字符串被压缩到main.js里面。会告诉我们哪一行哪一列出错了
+ 
+```javascript
+module.exports = {
+　　mode: 'development',
+　　devtool: 'cheap-inline-source-map'
+}
+```
+用cheap-inline会告诉我们哪一行出错了，不会告诉我们哪一列
+ 
+```javascript
+module.exports = {
+　　mode: 'development',
+　　devtool: 'inline-cheap-module-source-map'
+}
+```
+inline-cheap-module-source-map表示我不仅管业务代码的错误，还管第三方模块代码的错误
+ 
+
+```javascript
+module.exports = {
+　　mode: 'development',
+　　devtool: 'eval'
+}
+```
+eval是打包最快的一种，但是针对于比较复杂的情况下，eval提示的信息不一定全面
+ 
+
+最佳实践
+```javascript
+module.exports = {
+　　mode: 'development',
+　　devtool: 'cheap-module-eval-source-map'
+}
+```
+这种方式提示的错误比较全，打包速度比较快，
+
+ 
+
+如果是线上，建议这样
+```javascript
+module.exports = {
+　　mode: 'production',
+　　devtool: 'cheap-module-source-map'
+}
+```
+
+## 3.7 使用WebpackDevServer提升开发效率
+我们目前的状态是，如果代码有变动，每次都需要执行npm run bundle，然后打开index.html，
+在浏览器里面运行才行。这样，实际上，开发效率是比较低的。
+我希望如果代码改动，dist会自动的更改，再去看页面效果，刷新就好了。
+
+首先我们把package.json里面的script改成
+``` javascript
+"scripts": {
+　　"watch": "webpack --watch"
+},
+```
+
+这里加个watch是什么意思呢？意思是webpack会帮我们去watch，监听他打包的文件，只要打包的文件发生变化，他就会自动的重新打包。
+
+ 
+
+但是这个方式还是不够好，我希望，不仅自动打包，而且第一次watch的时候，自动给我打开浏览器，这个时候可以配合webpack的devServer来实现。
+需要安装webpack-dev-server
+webpack下配置
+
+#### 1 安装webpack-dev-server插件
+> npm install webpack-dev-server -D
+>
+> provides you with a simple web server and the ability to use live reloading. Let's set it up:
+
+``` javascript
+const path = require('path');// node 中的核心模块 path
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     */
+    mode: 'development',
+
+    devtool: 'cheap-module-eval-source-map',
+
+    // 起个服务器
+  + devServer: {
+  +     // 这个意思是服务器要生成在哪个文件夹下
+  +     contentBase:'./dist'
+  + },
+
+    entry: {...},
+    module: {...},
+
+    plugins: [...],
+    output: {...},
+};
+```
+
+package.json
+``` javascript
+"scripts": {
+　　"watch": "webpack --watch",
+　　"start": "webpack-dev-server"
+},
+```
+然后启动npm run start。他会提示我们Project is running at http://localhost:8080/。
+然后浏览器打开这个网页，在js发生变化的时候，webpack-dev-server也能感知到js发生的变化，会自动更新，不用重新刷新。
+
+所以webpack-dev-server比刚才的watch好在哪里。他不但会监听变化，重新帮我们打包，还会自动的重新刷新浏览器。这个时候我们再对webpack做一个配置
+
+``` javascript
+module.exports = {
+　　// 起个服务器
+　　devServer: {
+　　　　// 这个意思是服务器要生成在哪个文件夹下
+　　　　contentBase:'./dist',
+　　　　// 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+　+　　open:true
+　　}
+}
+```
+
+那么为什么要开这样一个服务器呢，我们在写react,vue的时候，知道前端都要写个ajax去请求，
+如果是通过npm run bundle,通过原始的webpack打包，打开dist文件下的index.html。这个时候页面去发ajax请求就不行了。
+因为如果要发ajax请求，这个地址必须在服务器上，通过http的形式打开。所以需要webpack-dev-server。
+ 
+
+我们不管写react还是vue。里面都有一个proxy这样的配置。实际上是帮助我们跨域的时候使用的接口代理。
+那为什么在react,vue之中可以使用接口代理呢？是因为，他们的底层都使用了webpack-dev-server。
+
+``` javascript
+// 起个服务器
+devServer: {
+　　// 这个意思是服务器要生成在哪个文件夹下
+　　contentBase:'./dist',
+　　// 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+　　open:true,
+    port: 9000, // 端口打开为9000
+　　// 如果浏览器访问localhost:8080/api下的地址，会自动转发到http://localhost:3000下
+　　proxy: {
+　　　　'/api': 'http://localhost:3000'
+　　}
+},
+```
+
+除了这三个配置，还可以有很多其它到配置项，https://webpack.js.org/configuration/dev-server#devserverproxy
+
+在我们使用比较老到脚手架工具，会发现他并没有配置webpack-dev-server。而是自己实现了一个类似于webpack-dev-server这样到内容。
+为什么呢，因为比较早的时候，webpack-dev-server不是特别的稳定。配置项也不多，有些作者认为不好用，就自己实现了
+
+``` javascript
+"scripts": {
+　　"bundle": "webpack",
+　　"watch": "webpack --watch",
+　　"start": "webpack-dev-server",
+　　"server": "node server.js"
+},
+```
+
+安装 npm install express webpack-dev-middleware -D
+
+在根目录下创建server.js
+
+server.js
+```javascript
+const express = require('express');
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const config = require('./webpack.common.js');
+const complier = webpack(config);
+
+const app = express();
+app.use(webpackDevMiddleware(complier,{
+　　publicPath:config.output.publicPath
+}))
+
+app.listen(3000, ()=>{
+　　console.log('server is running');
+})
+```
+
+然后运行localhost:3000就运行。实际上这样自己写，得到跟webpack-dev-server一样的效果，自己需要写很多内容。
+所以webpack-dev-server是最推荐的方式，也是业界用的最多的。
+所以这种方式是在node中使用webpack
+
+## 3.8 webpack中热模块更新
+
+Hot Module Replacement，热模块更新，很多时候会简写成HMR。
+``` javascript
+"scripts": {
+　　"start": "webpack-dev-server",
+},
+```
+
+在加热更新之前，我们运行npm run start，会发现之前我们打包有个dist目录，
+为什么运行这个命令的时候，dist目录没有了。实际上，webpack-dev-server，
+还是会对src目录下进行打包的。但是打包生成的文件，他并不会放在dist目录下。
+而是放到电脑中的内存里面。这样的话，可以有效的提升打包的速度。
+让我们开发更快，所以不用担心。
+
+index.js
+```javascript
+var btn = document.createElement('button');
+btn.innerHTML = '新增';
+document.body.appendChild(btn);
+
+btn.onclick = function() {
+　　var div = document.createElement('div');
+　　div.innerHTML = 'item';
+　　document.body.appendChild(div);
+}
+```
+
+这个js是点击一下新增，就新增一个item的div。现在我要实现一个样式的效果。
+偶数的时候给他加个背景
+
+style.css
+```css
+div:nth-of-type(odd) {
+　　background: yellow;
+}
+```
+
+这个时候我把yellow改成blue。webpack-dev-server检测到代码对变化就会重新刷新，需要重新点击去测试。那之前好不容易点的东西没有了，又要重新点击，于是我就希望，
+当改变样式代码的时候，不要刷新页面，只要改变样式就行了，
+不要给我删除掉之前的dom。这个时候就用到了HMR
+
+``` javascript
+...
+  +  const webpack = require('webpack')
+
+module.exports = {
+　　// 起个服务器
+　　devServer: {
+　　　　// 这个意思是服务器要生成在哪个文件夹下
+　　　　contentBase:'./dist',
+　　　　// 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+　　　　open:true,
+　　　　// 开启Hot Module Replacement
+　+　　　hot: true,
+　+　　　// 即便hmr的功能没有生效，浏览器也不要自动刷新
+　+　　　hotOnly: true
+　　},
+　　// HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+　　plugins: [
+　　　　new HtmlWebpackPlugin({
+　　　　　　template: 'src/index.html'
+　　　　}),
+　　　　new CleanWebpackPlugin(),
+　　　　// 当dev-server,两项host配置搞定后，再使用这个插件后，hmr功能就生效了
+　+　　　new webpack.HotModuleReplacementPlugin()
+　　],
+}
+```
+
+这个时候再去更改样式，就不会影响之前js对html的变更。改了css文件，就只会替换css的内容
+所以使用HMR的好处是,**在写css的时候，方便调试css**。
+ 
+ ---
+ 这是时候再把上面的配置恢复到没有hmr的时候
+ ``` javascript
+const path = require('path');// node 中的核心模块 path
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     */
+    mode: 'development',
+    //development 　devtool: 'cheap-module-eval-source-map'
+    //production 　 devtool: 'cheap-module-source-map'
+    devtool: 'cheap-module-eval-source-map',
+
+    // 起个服务器
+    devServer: {
+        // 这个意思是服务器要生成在哪个文件夹下
+        contentBase: './dist',
+        // 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+        open: true,
+        port: 8081,
+
+    },
+
+    entry: {
+        main: './src/index.js',// 项目的入口文件
+        // sub: './src/index.js'
+    },
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.eot|ttf|svg|woff$/, // 在执行引入字体文件的时候, 这个时候借助于file-loader打包
+                use: {
+                    loader: 'file-loader'
+                }
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
+            },
+            {
+                test: /\.scss$/i,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                            // modules:true // 加一个modules的配置，在引入css的地方改成这样
+                        }
+                    },
+                    'sass-loader',
+                    'postcss-loader'
+                ],
+            },
+        ],
+    },
+
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
+        new CleanWebpackPlugin(),
+    ],
+    output: {
+        // publicPath: '/',
+        // 打包后的js  的文件名
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+index.js
+```javascript
+import counter from './counter';
+import number from './number';
+
+counter();
+number();
+```
+
+counter.js
+```javascript
+function counter() {
+　　var div = document.createElement('div');
+　　div.setAttribute('id', 'counter');
+　　div.innerHTML = 1;
+　　div.onclick = function() {
+　　div.innerHTML = parseInt(div.innerHTML, 10) + 1;
+}
+
+document.body.appendChild(div);
+
+export default counter;
+```
+
+number.js
+```javascript
+function number() {
+　　var div = document.createElement('div');
+　　div.setAttribute('id', 'number');
+　　div.innerHTML = 1000;
+　　document.body.appendChild(div);
+}
+export default number;
+```
+
+这个时候运行页面，把1增加到10。这个时候将number.js里面写死的1000变成2000。发现，呀，我之前点击到的10，又重新恢复到了1。说明刷新了页面。之前的一些数据没有保存下来。我希望number的数据更新到，
+别去更新我counter.js到内容。这时候把配置加回来
+
+webpack.common.js
+
+```javascript
+module.exports = {
+　　// 起个服务器
+　　devServer: {
+　　　　// 这个意思是服务器要生成在哪个文件夹下
+　　　　contentBase:'./dist',
+　　　　// 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+　　　　open:true,
+　　　　// 开启Hot Module Replacement
+　　　　hot: true,
+　　　　// 即便hmr的功能没有生效，浏览器也不要自动刷新
+　　　　hotOnly: true
+　　},
+　　// HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+　　plugins: [
+　　　　new HtmlWebpackPlugin({
+　　　　　　template: 'src/index.html'
+　　　　}),
+　　　　new CleanWebpackPlugin(),
+　　　　// 当dev-server,两项host配置搞定后，再使用这个插件后，hmr功能就生效了
+　　　　new webpack.HotModuleReplacementPlugin()
+　　],
+}
+```
+
+发现number代码改成2000，页面上的1000并没有变成2000。这个时候需要自己去加点代码
+
+index.js
+```javascript
+import counter from './counter';
+import number from './number';
+
+counter();
+number();
+
+if(module.hot) {
+　　module.hot.accept('./number', ()=>{
+　　　　let removeNode = document.getElementById('number');
+　　　　document.body.removeChild(removeNode);
+　　　　number();
+　　})
+}
+```
+
+这个时候把1点到10。再去更改number里面的代码，把1000改成2000。
+这个时候发现10没有任何变化，只从1000更新到20000。
+ 
+
+那么这个时候就会想css会自动更新，这里却要在index里面多加这层判断。
+其实css也是要加这层判断的，只是css-loader里面已经加了这段代码，所以不用写。
+react,vue里面也内置了这些代码。本质上要写hmr的内容，都需要写这段。
+只不过框架帮我们实现了，自己不用去写。
+
+## 3.9 webpack中使用babel处理es6语法
+
+index.js
+```javascript
+const arr = [
+　　new Promise(()=>{}),
+　　new Promise(()=>{})
+];
+
+arr.map(item => {
+　　console.log(item);
+})
+```
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+运行npx webpack(用dev-server打包放在了缓存里面，
+看不到最终的打包内容)。看到打包生成的main.js的最后几行，
+index里面写的js，原封不动的打包到了main.js里面。这个时候浏览器中运行，
+可以打印出promise对象。好像是没问题的，这是什么原因呢，
+这是因为chrome更新比较快，es6里面很多东西，他都做了实现，
+所以直接在chrome浏览器写es6语法没问题，
+但是比如在ie或者更新没那么快的浏览器，，，就会报错。。
+
+
+这个时候需要借助babel,https://babeljs.io/。
+先安装两个包
+> npm install --save-dev babel-loader @babel/core
+
+一个是帮助webpack打包用的工具，一个是babel的核心库
+webpack配置babel相关
+```javascript
+module.exports = {
+　　module: {
+　　　　rules:[{
+　　　　　　test: /\.js$/,
+　　　　　　exclude: /node_modules/,
+　　　　　　loader: "babel-loader"
+　　　　}]
+　　}
+}
+```
+
+再继续安装
+> npm install @babel/preset-env --save-dev
+ 
+ 
+为什么要安装这个模块，当我们使用babel－loader处理js文件的时候，实际上这个babel-loader只是webpack和babel做通信的一个桥梁，用了他之后，webpack和babel做了打通，但实际上，babel-loader并不会帮助我们把es6语法翻译成es5语法，还需要借助一些其它的模块才能够帮助我们把es6语法翻译成es5语法。babel/preset-env就是这样的一个模块，这里面包含了所有把es6转化成es5的规则。
+装好之后，还需要在webpack里面配置一下
+
+``` javascript
+module.exports = {
+　　module: {
+　　　　+ rules:[{
+　　　　+ 　　test: /\.js$/,
+　　　　+ 　　exclude: /node_modules/,
+　　　　+ 　　loader: "babel-loader",
+　　　　+ 　　options:{
+　　　　+ 　　　　"presets": ["@babel/preset-env"]
+　　　　+ 　　}
+　　　　+ }]
+　　}
+}
+```
+
+再使用npx webpack，看转化后的main.js，发现es6的语法转化成了es5的语法。但是光做到这点不够。为什么呢？因为比如像Promise这样新的语法变量，包括数组里面这个map方法，在低版本的浏览器里，实际上还是不存在的。虽然了语法翻译，但只翻译了一部分。还有一些对象或者函数在一些低版本的浏览器里面还是没有的。
+ 
+
+所以不仅要用preset-env翻译es6，还需要将缺失的语法补充到浏览器里，这个模块就是babel/polyfill。然后把polyfill引入到业务代码的最顶部
+index.js
+
+```javascript
+import "@babel/polyfill";
+
+const arr = [
+　　new Promise(()=>{}),
+　　new Promise(()=>{})
+];
+
+arr.map(item => {
+　　console.log(item);
+});
+```
+
+处理好后，再运行，会发现原来打包好的main是28kb，现在是534kb。这多出来的内容就是polyfill弥补的内容，
+所以main.js一下子就变的很大。那么我不想要这么大，我只需要你在我需要补充语法的时候出来相应处理的代码就可以。
+安装
+>  npm install core-js --save-dev
+```
+module.exports = {
+　　module: {
+　　　　rules:[{
+　　　　　　test: /\.js$/,
+　　　　　　exclude: /node_modules/,
+　　　　　　loader: "babel-loader",
+　　　　　　options:{
+　　　　　　　　presets: [['@babel/preset-env',{
+　　　　　　　　/**
+　　　　　　　　* 当我做polyfill填充的时候，去加一些低版本特性的时候，我不是把所有特性都加进来
+　　　　　　　　* 是根据你的业务代码来决定要加什么
+　　　　　　　　*/
+　　　　　　　　useBuiltIns: 'usage',
+　　　　　　　　corejs: 3
+　　　　　　　　}]]
+　　　　　　}
+　　　　}]
+　　}
+}
+```
+主页打包出来的main就124kb，小了很多
+ 
+
+当然preset也可以配置一些额外的参数
+```javascript
+module.exports = {
+　　module: {
+　　　　rules:[{
+　　　　　　test: /\.js$/,
+　　　　　　exclude: /node_modules/,
+　　　　　　loader: "babel-loader",
+　　　　　　options:{
+　　　　　　　　presets: [['@babel/preset-env',{
+　　　　　　　　/**
+　　　　　　　　* 意思是我的这个项目，打包会运行在>67这个版本的chrome浏览器下
+　　　　　　　　* 比如chrome浏览器在67版本以上对es6语法支持很好了，就不需要翻译
+　　　　　　　　*/
+　　　　　　　　targets: {
+　　　　　　　　　　chrome: "67",
+　　　　　　　　},
+　　　　　　　　/**
+　　　　　　　　* 当我做polyfill填充的时候，去加一些低版本特性的时候，我不是把所有特性都加进来
+　　　　　　　　* 是根据你的业务代码来决定要加什么
+　　　　　　　　* @babel/polyfill，放在js入口
+　　　　　　　　*/
+　　　　　　　　useBuiltIns: 'usage',
+　　　　　　　　corejs: 3
+　　　　　　　　}]]
+　　　　　　}
+　　　　}]
+　　}
+}
+```
+再运行npm run bundle，发现main.js重新变成了28.8kb。
+
+这种方案不一定所有场景都适用，在开发一个第三方模块的时候，
+这个时候用polyfill注入是有问题的，因为这是时候注入会以全局变量的方式注入，
+会污染到全局环境。所以我们在打包UI组件库或者类库的时候，需要换一种打包的方式。
+去除index的pollfile。webpack也不做presets的配置了
+首先安装
+> npm install --save-dev @babel/plugin-transform-runtime
+> npm install --save @babel/runtime
+
+index.js
+```javascript
+// import "@babel/polyfill";
+
+const arr = [
+　　new Promise(()=>{}),
+　　new Promise(()=>{})
+];
+
+arr.map(item => {
+　　console.log(item);
+})
+```
+
+```javascript
+module.exports = {
+　　module: {
+　　　　rules:[{
+　　　　　　test: /\.js$/,
+　　　　　　exclude: /node_modules/,
+　　　　　　loader: "babel-loader",
+　　　　　　options:{
+　　　　　　　　"plugins": [["@babel/plugin-transform-runtime",{
+　　　　　　　　"absoluteRuntime": false,
+　　　　　　　　"corejs": 2,
+　　　　　　　　"helpers": true,
+　　　　　　　　"regenerator": true,
+　　　　　　　　"useESModules": false
+　　　　　　　　}]]
+　　　　　　}
+　　　　}]
+　　}
+}
+```
+
+再安装
+> npm install --save @babel/runtime-corejs2
+
+再运行npm run bundle，发现可以重新进行打包。
+
+另外补充一个知识点，如果我们认真的去配置babel相关的配置，会发现非常的长。我们可以在根目录新建一个文件。叫.babelrc。然后把options对象拿出来放到.babelrc里面。然后删除babel配置的option
+.babelrc
+
+``` json
+{
+  "plugins": [["@babel/plugin-transform-runtime",{
+    "absoluteRuntime": false,
+    "corejs": 2,
+    "helpers": true,
+    "regenerator": true,
+    "useESModules": false
+  }]]
+}
+```
+
+webpack.common.js
+```javascript
+module.exports = {
+　　module: {
+　　　　rules:[{
+　　　　　　test: /\.js$/,
+　　　　　　exclude: /node_modules/,
+　　　　　　loader: "babel-loader"
+　　　　}]
+　　}
+}
+```
+这样执行起来 npm run bundle 不会有任何问题
+
+## 3.10 webpack实现对react代码打包
+
+首先安装react相关能支持react代码的包
+> npm install react react-dom --save
+> npm install --save-dev @babel/preset-react
+
+index.js
+```
+import "@babel/polyfill";
+
+import React, { Component } from 'react';
+import ReactDom from 'react-dom';
+
+class App extends Component {
+　　render() {
+　　　　return <div>Hello World</div>
+　　}
+}
+
+ReactDom.render(<App />, document.getElementById('root'));
+```
+index.html
+``` html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+.babelrc
+``` javascript
+{
+　　"presets": [
+　　　　["@babel/preset-env",{
+　　　　　　　　"targets": {
+　　　　　　　　"chrome": "67",
+　　　　　　},
+　　　　　　"useBuiltIns": "usage",
+　　　　　　"corejs": 3
+　　　　}],
+　　　　"@babel/preset-react"
+　　]
+}
+```
+
+再运行npm run start。就可以正确读取到hello world这个文本了
+
+这样执行起来 npm run bundle 就可以对react 代码进行打包
+
+index.js
+```javascript
+// import "@babel/polyfill";
+```
+
+index.js里面只留下babel/polyfill。打包npm run bundle，会发现一条提示语。
+他的意思是如果.babelrc里面用了useBuiltIns。业务代码里面就不需要再引入babel/polyfill。webpack会自动引入polyfill。
+
+index.js
+```
+// import '@babel/polyfill';
+
+import React, {Component} from 'react';
+import ReactDom from 'react-dom';
+
+class App extends Component {
+    render() {
+        return (
+            <div>
+                Hello World
+            </div>
+        );
+    }
+}
+
+ReactDom.render(<App/>, document.getElementById('root'));
+```
+
+再运行npm run start, npm run bundle,
+同样可以运行和打包文件
+
+
+## 四 打包静态资源
+## 4.1 webpack中 tree shaking概念详解
+> 最理想的是我引用什么，就给我打包什么。在webpack 2.0以后提供了tree shaking的概念，意思是树抖动的意思。把没用的东西都摇晃掉
+math.js
+```javascript
+export const add = (a, b) => {
+　　console.log(a+b);
+}
+
+export const minus = (a, b) => {
+　　console.log(a-b);
+}
+```
+
+index.js
+```javascript
+import { add } from './math.js';
+
+add(1,2);
+```
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+所有文件准备好了后，我们打包npx webpack。打开index.html。就发现输出了3。说明代码已经正确的运行了。
+
+ 
+
+可以看到我在index里面只引用了add方法，但是在打包生成的文件里minus这个文件也存在打包文件里。虽然index.js里面只引用了math.js的一个方法，但是把所有的math.js都打包生成到了main.js里面。那这是没有必要的。因为业务代码只需要add。**最理想的是我引用什么，就给我打包什么。在webpack 2.0以后提供了tree shaking的概念，意思是树抖动的意思。把没用的东西都摇晃掉**。
+tree shaking只支持 ES Module的引入方式，因为es module底层是一个静态引入的方式，而commonjs是动态引入的方式。
+ 
+webpack.common.js
+```javascript
+module.exports = {
+　　mode: 'development',
+　　optimization: {
+　　　　// 看一看哪些模块被导出了，再去打包
+　　　　useExports: true
+　　}
+}
+```
+
+package.json
+```javascript
+{
+　　"sideEffects": false
+　　/***
+　　* 把不需要tre shaking的模块配置在这里
+　　* 如果webpack引入了tree shaking，那么webpack只要打包一个模块，就会应用tree shaking这种
+　　* 方式打包。如果没有引入任何一个模块，"sideEffects": ["babel/polyfill"]
+　　* babel/ polyfill引入就会报错。这里配置了后，tree shaking就不会去打包babel/polyfill
+　　* 但是现在我们写的是业务代码，不是第三方模块，不使用babel.polyfill，这是配置false，
+　　* 就是所有打包文件都走tree shaking。
+　　*/
+}
+```
+
+我们再去打包，发现minus还在，但是tree shaking已经生效了，前面会提醒，他已经知道只用了add方法，
+```javascript
+/*! exports provided: add, minus */
+/*! exports used: add */
+```
+
+但是在开发环境下，我们可能需要调试，
+报出来的行可能不准确，所以保留了代码。
+真正打包上线的时候，minus的代码就会不打包了这个时候。
+
+production的时候，optimization都不需要配置。production的时候tree shaking自动的配置好了。
+只需要 devtool: 'cheap-module-eval-source-map'就可以
+
+
+
+## 4.2 webpack中Development和Production模式的区分打包
+### 4.2.1 webpack.dev.js & webpack.prod.js
+当我们在开发一个项目的时候，我们一般用development这个环境进行项目的开发，在这个环境下，webpack使用dev-server，帮我们启用一个服务器，然后这个服务器里面还集成了一些，比如hmr这样的特性，只要我更改了代码，他会帮我们重新打包，然后我们代码的内容会实时的展示在对应的页面上，所以开发环境上，development这样的模式非常的方便，但是一旦我们的代码开发完成了，我们需要把我们的代码打包上线，这个时候主要用刀production模式，那么production模式和development模式差异主要在几个方面。
+ 
+
+首先在开发环境中，source-map他是非常全的，这样的话可以帮助我们快递定位问题，但是在production环境下，代码已经要上线了，这个时候source-map并不那么重要了，这个时候的source-map会更佳简洁一些
+ 
+
+另外一点，在开发环境下，我们的代码不压缩，一旦代码上线，我们希望我们的代码被压缩。
+ 
+
+所以在开发环境下，我们webpack.config.js里面
+
+webpack.common.js
+```javascript
+mode: 'development',
+devtool: 'cheap-module-eval-source-map',
+```
+
+在上线环境下
+```javascript
+mode: 'production',
+devtool: 'cheap-module-source-map',
+```
+
+每次开发上线，我们需要不断的去更改webpack.config.js的内容，这样就比较麻烦了，要像解决这个问题，我们这样做，我们给他改一个名字。开发坏境下我们使用webpack.dev.js。线上环境用webpack.prod.js。
+ 
+
+然后在package.json里面配置
+
+```javascript
+"scripts": {
+　　"dev": "webpack-dev-server --config webpack.dev.js",
+　　"build": "webpack --config webpack.prod.js",
+},
+```
+
+webpack.dev.js
+```javascript
+const path = require('path');// node 中的核心模块 path
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const webpack = require('webpack');
+
+// 'presets': [
+//     [
+//         '@babel/preset-env',
+//         {
+//             targets: {
+//                 chrome: "67",
+//             },
+//             /**
+//              * 当我做polyfill填充的时候，去加一些低版本特性的时候，我不是把所有特性都加进来
+//              * 是根据你的业务代码来决定要加什么
+//             */
+//             'useBuiltIns': 'usage',
+//         }
+//     ]
+// ],
+
+module.exports = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     */
+    mode: 'development',
+    //development 　devtool: 'cheap-module-eval-source-map'
+    //production 　 devtool: 'cheap-module-source-map'
+    devtool: 'cheap-module-eval-source-map',
+
+    // 起个服务器
+    devServer: {
+        // 这个意思是服务器要生成在哪个文件夹下
+        contentBase: './dist',
+        // 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+        open: true,
+        port: 8081,
+        // 开启Hot Module Replacement
+        hot: true
+    },
+
+    entry: {
+        main: './src/index.js',// 项目的入口文件
+        // sub: './src/index.js'
+    },
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel-loader',
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.eot|ttf|svg|woff$/, // 在执行引入字体文件的时候, 这个时候借助于file-loader打包
+                use: {
+                    loader: 'file-loader'
+                }
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
+            },
+            {
+                test: /\.scss$/i,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                            // modules:true // 加一个modules的配置，在引入css的地方改成这样
+                        }
+                    },
+                    'sass-loader',
+                    'postcss-loader'
+                ],
+            },
+        ],
+    },
+
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
+        new CleanWebpackPlugin(),
+        // 当dev-server,两项host配置搞定后，再使用这个插件后，hmr功能就生效了
+        new webpack.HotModuleReplacementPlugin()
+    ],
+
+    optimization: {
+        // 看一看哪些模块被导出了，再去打包
+        usedExports: true,
+    },
+    output: {
+        // publicPath: '/',
+        // 打包后的js  的文件名
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+webpack.prod.js
+```javascript
+const path = require('path');// node 中的核心模块 path
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+// 'presets': [
+//     [
+//         '@babel/preset-env',
+//         {
+//             targets: {
+//                 chrome: "67",
+//             },
+//             /**
+//              * 当我做polyfill填充的时候，去加一些低版本特性的时候，我不是把所有特性都加进来
+//              * 是根据你的业务代码来决定要加什么
+//             */
+//             'useBuiltIns': 'usage',
+//         }
+//     ]
+// ],
+
+module.exports = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     */
+    mode: 'production',
+    //development 　devtool: 'cheap-module-eval-source-map'
+    //production 　 devtool: 'cheap-module-source-map'
+    devtool: 'cheap-module-source-map',
+
+    entry: {
+        main: './src/index.js',// 项目的入口文件
+        // sub: './src/index.js'
+    },
+    module: {
+        rules: [// 其中包含各种loader的使用规则
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel-loader',
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,// 正则表达式，表示打包 图片 后缀的文件
+                use: {
+                    loader: 'url-loader',// 针对图片文件使用的loader，注意有先后顺序，数组项越靠后越先执行
+                    options: {
+                        // placeholder 占位符
+                        name: '[name]_[hash].[ext]',// 配置打包的图片的名字为 :  [原图片名称]_[这次打包的后缀].后缀名
+                        outputPath: 'images/', // 将打包生成的图片放到 dist/images 目录下
+                        limit: 10240 //大于(或等于) 10 kb 图片会被打包到 images 文件夹下
+                    }
+                },
+            },
+            {
+                test: /\.eot|ttf|svg|woff$/, // 在执行引入字体文件的时候, 这个时候借助于file-loader打包
+                use: {
+                    loader: 'file-loader'
+                }
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader', 'postcss-loader'],
+            },
+            {
+                test: /\.scss$/i,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                            // modules:true // 加一个modules的配置，在引入css的地方改成这样
+                        }
+                    },
+                    'sass-loader',
+                    'postcss-loader'
+                ],
+            },
+        ],
+    },
+
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+
+    output: {
+        // publicPath: '/',
+        // 打包后的js  的文件名
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'dist'), // 打包后的文件放到哪里,输出文件的路径是绝对路径,  __dirname:webpack 文件的路径
+    },
+};
+```
+
+此时可以正常打包 和 开发
+
+#### 4.2.2 合并相同的代码
+> 提取公共的代码, 对文件进行合并
+---
+> 我们发现dev和build存在很多相同的代码。比如entry,modules,output。这样就会出现大量重复代码，为了解决这个问题，我们新建一个webpack.common.js。把公共的抽出来，抽出来之后，这个时候直接这样肯定不行，
+> npm run dev就只有webpack.dev.js这里面的文件。我们需要跟它们做一个合并。安装
+>
+> npm install webpack-merge -D
+然后webpack.dev.js和webpack.prod.js引入merge模块
+ 
+
+webpack.common.js
+```javascript
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+
+module.exports = {
+    // 这个文件要做打包，从哪一个文件开始打包
+    entry: {
+        main: './src/index.js'
+    },
+    // 打包模块不知道该怎么办，就去模块配置里面该怎么办
+    module: {
+        // 规则
+        rules: [{
+            test: /\.js$/,
+            // 如果你的这个js文件在node_modules里面，就不使用babel-loader了
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+        }, {
+            // 假设是以jpg结尾的，我需要一个load帮助我们去打包
+            test: /\.jpg|png|gif$/,
+            use: {
+                loader: 'url-loader',
+                options: {
+                    // 原来是什么名字，打包好还是什么名字
+                    name: '[name]_[hash].[ext]',
+                    // 当我碰到jpg,png,gif的时候，打包到根目录下到imgs文件夹里
+                    outputPath: 'imgs/',
+                    limit: 2048
+                }
+            }
+        }, {
+            test: /\.eot|ttf|svg|woff$/,
+            use: {
+                loader: 'file-loader'
+            }
+        }, {
+            // 假设是以css结尾的，我需要一个load帮助我们去打包
+            test: /\.scss$/,
+            // 需要两个loader，所以不能是个对象，需要是个数组
+            use: [
+                'style-loader',
+                {
+                    loader: 'css-loader',
+                    options: {
+                        importLoaders: 2
+                    }
+                },
+                'sass-loader',
+                'postcss-loader'
+            ]
+        }, {
+            test: /\.css$/,
+            use: [
+                'style-loader',
+                'css-loader',
+                'postcss-loader'
+            ]
+        }]
+    },
+    // HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'src/index.html'
+        }),
+        new CleanWebpackPlugin()
+    ],
+    // 打包文件要放到哪里去，就配置在output这个对象里
+    output: {
+        // 打包好的文件名字
+        filename: '[name].js',
+        /**
+         　　　　* 打包出的文件要把他放到哪一个文件夹下，path后面要放一个绝对路径
+         　　　　* __dirname指的是webpack.config.js所在的当前目录的这个路径
+         　　　　* 下面这个结合就是一个绝对路径
+         　　　　*/
+        path: path.resolve(__dirname, 'dist')
+    }
+};
+```
+
+
+webpack.dev.js
+```javascript
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const commonConfig = require('./webpack.common.js');
+
+const devConfig = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     　　*/
+    mode: 'development',
+    /**
+     　　* cheap:在生成source-map的时候可以不带列信息，只带行信息就可以了
+     　　* 同时不要对我load代码的source-map。只要对我的业务代码进行source-map生成
+     　　* 这种方式提示的错误比较全，打包速度比较快，
+     　　*/
+    devtool: 'cheap-module-eval-source-map',
+
+    // 起个服务器
+    devServer: {
+        // 这个意思是服务器要生成在哪个文件夹下
+        contentBase: './dist',
+        // 启动的时候自动打开浏览器，然后自动访问这个服务器地址
+        open: true,
+        // 开启Hot Module Replacement
+        hot: true
+    },
+    // HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+    plugins: [
+        new webpack.HotModuleReplacementPlugin()
+    ]
+};
+
+module.exports = merge(commonConfig, devConfig);
+```
+
+webpack.prod.js
+```javascript
+const merge = require('webpack-merge');
+const commonConfig = require('./webpack.common.js');
+
+const prodConfig = {
+    /**
+     　　* 打包模式，不配置会警告，但底层还是会去配置默认的，就是production
+     　　* production: 压缩模式，被压缩的代码
+     　　* development: 开发模式，不压缩的代码
+     　　*
+     　　*/
+    mode: 'production',
+    /**
+     　　* cheap:在生成source-map的时候可以不带列信息，只带行信息就可以了
+     　　* 同时不要对我load代码的source-map。只要对我的业务代码进行source-map生成
+     　　* 这种方式提示的错误比较全，打包速度比较快，
+     　　*/
+    devtool: 'cheap-module-source-map'
+};
+module.exports = merge(commonConfig, prodConfig);
+```
+
+
+这样运行npm run dev, npm run build就没有问题了。
+
+#### 4.2.3 将代码放到文件中
+
+有时候第三方模块会给webpack进行一个整合，
+都放到build目录里。这两个时候package.json需要进行一个更改
+
+---
+1. 新建build 目录
+2. 将 webpack.common.js, webpack.dev.js, webpack.prod.js 文件放到 build 目录中
+3. 修改package.json 中的下列代码
+``` javascript
+"scripts": {
+　　"dev": "webpack-dev-server --config ./build/webpack.dev.js",
+　　"build": "webpack --config ./build/webpack.prod.js",
+}
+```
+
+这样运行npm run dev, npm run build就没有问题了。
+
+#### 4.2.4 dist 文件目录修改
+
+使用npm run dev："webpack-dev-server --config ./build/webpack.dev.js。"，
+会看不到打包生成的dist目录。
+
+所以我们使用一个新的，不要启用dev-server服务。使用npm run dev-build:"webpack --config ./build/webpack.dev.js"。
+
+这个时候我们发现，dist目录生成到了build下面。
+![dist_file_into_build_file](https://img2018.cnblogs.com/blog/331769/201905/331769-20190502173616136-1766840880.png)
+
+我们build下面放到都是webpack配置。这是因为之前webpack移动到了build目录，输出文件到地方没改。直接写dist。
+指的是:
+dist目录生成在webpack同级的目录下。改成 `../dist`。就可以了。
+
+**所以webpack的配置项真的是巨多，想完全的能记住是不可能的，所以遇到打包的问题怎么办，首先是打开打包的命令行工具，然后去分析，当你打包的过程开始执行时，他一步一步具体的流程之中哪里出了问题，通过控制台，我们就可以找到这些问题，找到问题后，截取出来，然后到google或者stack overflow上去提问，搜索问题的解决方案，找到后，再去找对应文档上的配置说明，根据文档，再回头去修改我们的配置文件，改的过程中遇到新的问题，再一点一点的去解决。**
+
+## 4.3 Code Splitting
+
+接着进入正题。Code Splitting到底是什么？代码分割到底是什么？举个例子。
+首先我们安装一个包，叫做lodash。
+> npm install lodash --save
+
+他是一个功能集合，提供了很多工具方法，
+可以高性能的比如字符串拼装的一些函数。然后继续写代码
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+
+// 一般我们习惯用_去代替lodash。
+import _ from "lodash";
+
+console.log(_.join(['a', 'b', 'c'], '*'))
+
+其实他引入了一个库，在这里，使用这个库，做了一个字符串链接这样的操作。最终打印的结果应该是a*b*c这样的字符串。然后我们输入npm run dev-build打包结束后，浏览index.html。发现控制它输出了a*b*c。所以这个函数就是字符串连接的函数。
+
+ 
+
+然后我们看到lodash和我们的业务代码都被打包到一个文件中。我们到main.js有1.38M。非常大。工具库和业务逻辑统一打包到main.js里面。这种方式做打包会带来一个潜在的问题。
+
+
+第一种方式
+假设lodash有1mb，业务逻辑代码1mb。那么main.js 2mb
+打包文件会很大，加载时间会很长
+当页面业务逻辑发生变化时，又要加载2MB的内容
+
+那么我们需要解决这个问题，在src目录下，我再创建一个文件，
+叫做lodash.js。然后将lodash的引入放放到lodash.js文件里面
+
+lodash.js
+```javascript
+// 一般我们习惯用_去代替lodash。
+import _ from "lodash";
+window._ = _;
+```
+
+index.js
+```javascript
+console.log(_.join(['a', 'b', 'c'], '*'))
+```
+
+webpack.common.js
+
+```javascript
+module.exports = {
+　　entry: {
+　　　　lodash: './src/lodash.js',
+　　　　main: './src/index.js'
+　　}
+}
+```
+
+再运行npm run dev-build。发现打包出来两个文件。这个时候lodash就跟index.js分开加载了。之前用户需要加载完2MB的页面才能加载页面。现在我们把main.js分成了两个文件，
+分别是lodash.js和index.js。这是时候我们去想，
+
+
+第二种方式
+main.js被拆成lodash.js，index.js，分别是1mb。
+当页面业务逻辑发生变化时，只要加载main.js即可。
+
+这种代码的拆分，就是我们代码的核心概念.CodeSplitting。没有代码拆分完全可以，但是有代码拆分会提升性能。第二种方式是我们自己做的代码分割。不够智能。在webpack里面使用一些插件，可以智能的帮我们做code split。那么我们接下来看webpack这么自动帮我们做
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+import _ from "lodash";
+console.log(_.join(['a', 'b', 'c'], '*'))
+```
+
+webpack.common.js
+```javascript
+module.exports = {
+　　// 优化
+　　optimization: {
+　　　　// 帮我们做代码分割
+　　　　splitChunks: {
+　　　　　　chunks: 'all'
+　　　　}
+　　}
+}
+```
+
+然后运行npm run dev-build。看运行结果，webpack是怎么帮我们做代码分割的。
+![code_splitting](https://img2018.cnblogs.com/blog/331769/201905/331769-20190502173514100-1362956156.png)
+
+打包生成的文件除了main.js。还多出了一个文件，叫做vendors~main.js。我们打开main.js，发现里面有index的业务逻辑，但是并没有lodash。再打开vendors~main.js。发现他自己把lodash提取出来。我们只做了一个非常简单的配置，webpack自己就知道了当遇到这种公用的类库的时候，自动就打包生成文件。这就是**我们webpack的code splitting。所以说代码分割是webpack非常有竞争力的功能。**
+
+ 
+
+当然,webpack里面的代码分割不仅仅可以通过这种配置完成。我们还可以通过另外一种方式进行webpack中的代码分割。之前的那种方式是，index.js的lodash和业务逻辑是同步的。webpack通过分析去做分割。那实际上。我们除了同步的去做代码分割之外，我们还可以异步的去进行加载第三方类库。
+
+index.js
+```javascript
+function getComponent() {
+　　// 异步调用的lodash返回回来后，会放到_这个变量里
+　　return import('lodash').then(( {default: _} )=>{
+　　　　var element = document.createElement('div');
+　　　　element.innerHTML = _.join(['1', ' ', '2'], '-');
+　　　　return element;
+　　})
+}
+
+getComponent().then(element => {
+　　document.body.appendChild(element);
+})
+```
+
+然后npm run dev-build。
+
+然后重新的去打包，已经没有问题了。这个时候，我们再打开dist目录。除了main.js，还有一个0.js。main.js只有业务代码。0.js里面打包了lodash。也就是说，webpack在做同步性质的打包的时候，直接上面 import _ from 'lodash'。然后他会分析代码，自动的分割出lodash。
+现在代码是异步加载的时候。webpack也会去做代码的分割。
+
+总结：
+1、代码分割跟webpack无关
+2、所以webpack分割代码有两种方式，一种是同步的方式，靠
+
+```javascript
+optimization: {
+    // 帮我们做代码分割
+    splitChunks: {
+        chunks: 'all'
+    }
+},
+```
+
+这个配置。
+一种是异步的方式，无需做任何配置，会自动进行代码分割。需要额外的安装 babel-plugin-dynamic-import-webpack 支持。(新版本已支持 动态模块加载)
+
+
+## 4.4 SplitChunksPlugin配置参数详解
+webpack中SplitChunksPlugin配置参数详解
+
+webpack的代码分割，底层使用了splitchunksplugin这个插件。我们上次打包生成的文件是这样的。
+![SplitChunksPlugin_img](https://img2018.cnblogs.com/blog/331769/201905/331769-20190506064258219-1897480955.png)
+
+index.js
+```javascript
+function getComponent() {
+　　// 异步调用的lodash返回回来后，会放到_这个变量里
+　　// 这个魔法注释的意思是我异步引入lodash这样的库，在打包的时候，给这个库的名字取名叫lodash。
+　　return import(/* webpackChunkName:"lodash" */ 'lodash').then(( {default: _} )=>{
+　　　　var element = document.createElement('div');
+　　　　element.innerHTML = _.join(['1', ' ', '2'], '-');
+　　　　return element;
+　　})
+}
+
+getComponent().then(element => {
+　　document.body.appendChild(element);
+})
+```
+
+babel中去除，babel-plugin-dynamic-import-webpack，这个插件不支持魔法注释。package.json也移除掉这个babel-plugin-dynamic-import-webpack。取而代之，我们去找一个官方引入的动态引入的插件。
+> npm install --save-dev @babel/plugin-syntax-dynamic-import
+
+
+然后放入babel.rc中
+ 
+
+.babel.rc
+``` javascript
+{
+　　"presets": [
+　　　　["@babel/preset-env",{
+　　　　　　　　"targets": {
+　　　　　　　　"chrome": "67",
+　　　　　　},
+　　　　　　"useBuiltIns": "usage",
+　　　　　　"corejs": 3
+　　　　}],
+　　　　"@babel/preset-react"
+　　],
+　　"plugins": ["@babel/plugin-syntax-dynamic-import"]
+}
+```
+运行npm run dev-build，然后打包出来的名字就不是0.js了，而是vendors~lodash.js。那么我想打包出来的就是lodash怎么弄。需要加个配置。
+
+```javascript
+module.exports = {
+　　optimization: {
+　　　　// 帮我们做代码分割
+　　　　splitChunks: {
+　　　　　　chunks: 'all',
+　　　　　　cacheGroups: {
+　　　　　　　　vendors: false,
+　　　　　　　　default: false
+　　　　　　}
+　　　　}
+　　},
+}
+```
+
+将cacheGroups中的vendors，default都设为false。所以不管同步的代码分割还是异步代码分割，我们都要使用splitChunks这个插件。 
+
+```javascript
+module.exports = {
+　　optimization: {
+　　　　// 帮我们做代码分割
+　　　　splitChunks: {}
+　　},
+}
+```
+
+我将splitChunks改成一个空对象，然后进行打包,npm run dev-build。
+也能打包成功，这是为什么嗯？我们打开官方文档
+> https://webpack.js.org/plugins/split-chunks-plugin
+
+就能发现我们什么都不配置，他有一个默认的配置内容。
+
+![split-chunks-plugin_web_config](https://img2018.cnblogs.com/blog/331769/201905/331769-20190506064400376-1716227253.png)
+
+它们分别是什么意思呢
+```javascript
+module.exports = {
+　　// 优化
+　　optimization: {
+　　　　// 帮我们做代码分割
+　　　　splitChunks: {
+　　　　　　// 意思是做代码分割的时候只对异步代码生效，如果想对同步异步都有效，配置成"all"
+　　　　　　chunks: 'all',
+　　　　　　// 引入到这个类库大于30kb才做代码分割，如果小于30kb就不做代码分割
+　　　　　　minSize: 30000,
+　　　　　　// 当改成2就不做代码分割了，因为他发现代码里面只用了一次lodash的引入，小于2
+　　　　　　minChunks: 1,
+　　　　　　// 同时加载的模块数，最多是5个。也就是说打包前5个的时候，会帮忙分割代码，后面的就不分割了
+　　　　　　maxAsyncRequests: 5,
+　　　　　　// 入口文件，引入其他的js库，引入的文件最多只能分割成3个文件
+　　　　　　maxInitialRequests: 3,
+　　　　　　// 文件生成的时候，文件中间会有一个链接符，比如verdors~main.js
+　　　　　　automaticNameDelimiter: '~',
+　　　　　　// 指的的cachegroups的名字有效,不然就是0.js,1.js
+　　　　　　name: true,
+　　　　　　// 缓存组
+　　　　　　cacheGroups: {
+　　　　　　　　vendors: {
+　　　　　　　　　　/**
+　　　　　　　　　　* test会检测，同步引入的库是否是在node_modules里面，是的话单独打包
+　　　　　　　　　　* 打包vendor~main.js。符合vendors这个组，同时入口是main。
+　　　　　　　　　　*/
+　　　　　　　　　　test: /[\\/]node_modules[\\/]/,
+　　　　　　　　　　/**
+　　　　　　　　　　* lodash既符合vendors，也符合default。因为default没有test，就是都支持，那么根据什么来呢
+　　　　　　　　　　* 根据priority,他的值越大，优先级越高，比如-10>-20
+　　　　　　　　　　*/
+　　　　　　　　　　priority: -10,
+　　　　　　　　　　// 当代码同步的时候，一旦遇到是第三方类库，同时满足大于30kb，同时被引入超过1次，同时满足下面的条件，统一打包到vendors.js里面
+　　　　　　　　　　filename: 'vendors.js'
+　　　　　　　　},
+　　　　　　　　// 如果不是第三方库的代码走这，如果导入的代码（minSize: 0）大于0kb且不是第三方库，那么分割到common.js中
+　　　　　　　　default: {
+　　　　　　　　　　priority: -20,
+　　　　　　　　　　/**
+　　　　　　　　　　* 比如index.js引入了a模块，b模块。a模块里面也引入了b模块
+　　　　　　　　　　* 如果配置了reuseExistingChunk，就会判断，如果a里面已经引入了b模块，就不再引入index.js的b模块了
+　　　　　　　　　　* 避免重复打包
+　　　　　　　　　　*/
+　　　　　　　　　　reuseExistingChunk: true,
+　　　　　　　　　　filename: 'common.js'
+　　　　　　　　}
+　　　　　　}
+　　　　}
+　　}
+}
+```
+
+## 4.5 webpack中懒加载是什么，chunk是什么
+
+index.js
+```javascript
+function getComponent() {
+　　// 异步调用的lodash返回回来后，会放到_这个变量里
+　　// 这个魔法注释的意思是我异步引入lodash这样的库，在打包的时候，给这个库的名字取名叫lodash。
+　　return import(/* webpackChunkName:"lodash" */ 'lodash').then(( {default: _} )=>{
+　　　　var element = document.createElement('div');
+　　　　element.innerHTML = _.join(['1', ' ', '2'], '-');
+　　　　return element;
+　　})
+}
+
+document.addEventListener('click', ()=> {
+　　getComponent().then(element => {
+　　　　document.body.appendChild(element);
+　　})
+})
+```
+
+执行npm run dev-build。dist文件夹里面vendors~lodash被打包出来了。这个时候执行dist下面的index.html。发现最开始的时候只加载了index.html和main.js。只有点击页面的时候,vendors~lodash.js开始加载。所以**通过异步的import语法，有些模块，我们可以对他进行懒加载。什么时候执行到import，什么时候执行**。
+
+好处是借助异步import语法，可以让页面加载更快，刷新的时候根本用不到lodash。webpack跟import没有必然的联系。而是import这种写法可以被webpack识别，然后去实现懒加载
+ 
+
+es7写法index.js
+```javascript
+async function getComponent() {
+　　const { default: _ } = await import(/* webpackChunkName:"lodash" */ 'lodash');
+　　var element = document.createElement('div');
+　　element.innerHTML = _.join(['1', ' ', '2'], '-');
+　　return element;
+}
+
+document.addEventListener('click', ()=> {
+　　getComponent().then(element => {
+　　　　document.body.appendChild(element);
+　　})
+})
+```
+
+**我们打包好的dist下面的js文件，每个js文件就是一个chunk。**这个可以从打包的过程可以看出
+
+![chunk_img_url](https://img2018.cnblogs.com/blog/331769/201905/331769-20190507095524093-2031594762.png)
+
+那么这个chunk有什么样的意义呢？
+```javascript
+module.exports = {
+　　//...
+　　optimization: {
+　　　　splitChunks: {
+　　　　　　chunks: 'async',
+　　　　　　minSize: 30000,
+　　　　　　maxSize: 0,
+　　　　　　minChunks: 1,
+　　　　　　maxAsyncRequests: 5,
+　　　　　　maxInitialRequests: 3,
+　　　　　　automaticNameDelimiter: '~',
+　　　　　　name: true,
+　　　　　　cacheGroups: {
+　　　　　　　　vendors: {
+　　　　　　　　　　test: /[\\/]node_modules[\\/]/,
+　　　　　　　　　　priority: -10
+　　　　　　　　},
+　　　　　　　　default: {
+　　　　　　　　　　minChunks: 2,
+　　　　　　　　　　priority: -20,
+　　　　　　　　　　reuseExistingChunk: true
+　　　　　　　　}
+　　　　　　}
+　　　　}
+　　}
+};
+```
+
+我们看之前的配置里面的splitChunks。里面有个minChunks。这个意思是整个项目有两个地方以上的地方引入了第三方库（lodash.js），那么就打包成一个chunk。如果只有一个地方用到，就不打包成chunk。
+
+```javascript
+optimization: {
+　　// 帮我们做代码分割
+　　splitChunks: {
+　　　　// 意思是做代码分割的时候只对异步代码生效，如果想对同步异步都有效，配置成"all"
+　　　　chunks: 'all'
+　　}
+}
+```
+
+之前我们没有写那些配置也可以，因为默认就配置了那些。所以我们配置的时候只要这样，让他自动的给我们进行代码分割就可以。默认的分割本身比较合理。如果就是要按自己的风格，再对其不同的配置项配置
+
+
+## 4.6 webpack打包分析，preloading,prefetching的使用
+打包分析：当我们使用webpack进行打包之后呢，我们可以借助webpack的一些打包工具进行一定的分析，然后看一下他打包是否合理。
+webpack官网提供的一个分析工具的仓库：https://github.com/webpack/analyse。
+如果要对我们自个打包生成的代码进行一个分析，首先要生成一个打包过程的描述文件，将--profile --json > stats.json粘贴到package.json
+``` javascript
+"scripts": {
+　　"dev-build": "webpack --profile --json > stats.json --config ./build/webpack.dev.js",
+　　"bundle": "webpack",
+　　"watch": "webpack --watch",
+　　"dev": "webpack-dev-server --config ./build/webpack.dev.js",
+　　"build": "webpack --config ./build/webpack.prod.js",
+　　"server": "node server.js"
+},
+```
+
+ 他的意思是我把打包过程中的一些描述放置到stats.json的文件里面。这个文件的格式是一个json的格式。这么写完之后，我们进行一次打包。打包完之后在根目录出现一个叫做stats.json的文件。这个文件就是webpack自动生成的对应的我们webpack的描述文件。生成这个文件之后打开分析仓库，进入http://webpack.github.io/analyse/。把我们生成的stats.json传进去。会得到下面的这种结果
+ 
+ ![stats_img](https://img2018.cnblogs.com/blog/331769/201905/331769-20190509064537459-687582401.png)
+ 
+ 告诉我们，整个打包用的是webpack 4.30.0的版本进行的打包。耗时，1.24s。打包对应的hash值是c631e7b50a03b44511b4。里面有4个模块。2个chunk，也就是2个文件，打包生成3个静态文件，打包过程没有警告，没有异常。上面的后面是每个的详细解析
+ 
+  
+ 除了这个工具之外，还有其他的分析工具，
+ 
+ ``` javascript
+https://webpack.js.org/guides/code-splitting/#bundle-analysis
+```
+ 
+。可以安装webpack-bundle-analyzer。我们做复杂项目的时候，代码分割跟我们的预期不相符，就可以通过这个做一些代码分析。看一看是不是有些代码重复打包了，是不是有哪些地方可以优化，哪一部分耗时比较长。
+
+```javascript
+optimization: {
+　　splitChunks: {
+　　　　chunks: 'all'
+　　}
+}
+```
+
+我们现在这个chunks是all，如果我们将此注释掉，默认的值是什么呢，是aysnc。也就是webpack默认只对异步代码进行分割。那么webpack为什么这么做呢。像jquery，lodash，这种库，应该对他进行分割。这样浏览器可以对他缓存，提高访问速度。但是我们只是提高第二次访问的速度。那真正的对页面做优化，webpack想达到的效果是，当你第一次访问页面的时候，他的加载速度就是最快的。要满足这种，靠将jquery,lodash打包成单独的文件是满足不了需求的。那么webpack真正希望我们编写代码的方式是什么样的呢？
+
+
+index.js
+```javascript
+// async function getComponent() {
+// const { default: _ } = await import(/* webpackChunkName:"lodash" */ 'lodash');
+// var element = document.createElement('div');
+// element.innerHTML = _.join(['1', ' ', '2'], '-');
+// return element;
+// }
+ 
+
+// document.addEventListener('click', ()=> {
+// getComponent().then(element => {
+// document.body.appendChild(element);
+// })
+// })
+ 
+
+document.addEventListener('click', ()=> {
+　　var element = document.createElement('div');
+　　element.innerHTML = '1-2';
+　　document.body.appendChild(element);
+})
+```
+
+下面的这个方式是我们以前标准的js写法。这段代码肯定没有问题。但是这个代码是否就完全没有优化的空间了，或者说这是不是webpack推荐的代码编写的方式。显然不是
+
+ 
+
+打开控制台，快捷键 command+shift+p。 输入coverage，打开coverage，点击录制，刷新页面。可以看到main.js的利用率只有75.5%。那么为什么是75.5％呢，看到上面的main.js，一些红色，一些绿色，绿色的才有意义，红色的没用。click里面的代码，只有点击后才变绿。不然是红色，点击前是没有用的代码。一开始加载的时候，这里面的代码就不会执行，不会执行的代码，一开始就让页面下载下来，实际上就会浪费执行的性能
+ 
+
+那么webpack希望这种交互的代码应该放到异步加载的模块里面去写，新建一个click.js
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+document.addEventListener('click', ()=> {
+　　import('./click.js').then(({default: func}) => {
+　　　　func()
+　　})
+})
+```
+
+click.js
+```javascript
+function handleClick(){
+　　var element = document.createElement('div');
+　　element.innerHTML = '1-2';
+　　document.body.appendChild(element);
+}
+
+export default handleClick;
+```
+
+这个时候打包后运行index.html，发现main.js的利用率变成了78％，因为加载页面的时候并没有加载业务。所以webpack希望多写异步的代码，所以默认的chunks默认配置的是async。异步的。
+
+ 
+
+比如用户未登录的情况下，首先我只加载首页的逻辑，不加载登录的逻辑，那么等我点击登录的时候再去记载登录，会不会很慢呢，那么preloading,prefetching就是解决这个问题的。在首页加载好之后，**空闲的时间偷偷的去把登录的模块加载好**。如果利用这个空闲的时间，两个条件都满足了。那么怎么做呢
+ 
+
+将 /* webpackPrefetch: true */ 这句话放到引入的前面
+index.js 
+```javascript
+document.addEventListener('click', ()=> {
+　　import(/* webpackPrefetch: true */'./click.js').then(({default: func}) => {
+　　　　func()
+　　})
+})
+```
+
+意思是的当我点击的时候，去加载click.js，但不是非得点击的时候才去加载，而是主要的js加载好之后，有空闲的时候，会偷偷的去家在click.js。上面的这种魔法注释是prefetch的用法 
+
+```
+https://webpack.js.org/guides/code-splitting#prefetchingpreloading-modules
+```
+
+preloading,prefetching的区别。prefetching会等主要的js加载完之后，空闲的时候再去加载click.js
+/* webpackPreload: true */。preload是和主要的文件一起去加载的，所以preload还是不怎么合理的。
+
+## 4.7 webpack中css文件的代码分割
+```javascript
+module.exports = {
+　　output: {
+　　　　filename: '[name].js',
+　　　　chunkFilename: '[name].chunk.js',
+　　　　path: path.resolve(__dirname, '../dist')
+　　}
+}
+```
+
+在看别人写的webpack，output配置项，肯跟会碰到chunkFilename这样的配置项，那这个是什么意思呢？filename和chunkFilename有什么区别呢？首先看个例子
+
+ 
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+async function getComponent() {
+　　const { default: _ } = await import(/* webpackChunkName:'lodash' */'lodash');
+　　const element = document.createElement('div');
+　　element.innerHTML = _.join(['1', '2'], '-');
+　　return element
+}
+
+document.addEventListener('click', ()=> {
+　　getComponent().then( element =>{
+　　　　document.body.appendChild(element);
+　　})
+})
+```
+
+webpack.common.js
+```javascript
+module.exports = {
+　　entry: {
+　　　　main: './src/index.js'
+　　},
+　　output: {
+　　　　filename: '[name].js',
+　　　　chunkFilename: '[name].chunk.js',
+　　　　path: path.resolve(__dirname, '../dist')
+　　}
+}
+```
+
+运行npm run dev-build打包。打开dist目录，发现第三方模块打包好的名字叫vendors~lodash.chunk.js，不再是之前的vendors~lodash.js。我们的入口文件对应的都是filename的输出。如果不是入口文件，是异步引入或者间接产生的js文件，他就会走chunkFilename这个输出的配置参数。
+
+接下来进入主题，css代码的分割
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+
+index.js
+```javascript
+import './style.css';
+console.log(' hello world ');
+```
+
+style.css
+```css
+body{
+　　background: #abcdef;
+}
+```
+
+
+运行npm run dev-build。发现打包生成的文件只有main.js 和 vendors~main.chunk.js。但是浏览器打开index.html。背景已经有了。这是怎么回事呢？webpack在做css的打包的时候，会直接打包到js里面
+ 
+
+如果我希望在打包生成代码的时候，如果我引入了css文件，那么把css文件打包到dist目录下。而不是直接引入到js文件里面。那么就需要引入一个插件
+
+
+```javascript
+https://webpack.js.org/plugins/mini-css-extract-plugin
+
+npm install --save-dev mini-css-extract-plugin
+```
+
+
+这个插件可以对css进行代码分割。这个插件不适合开发环境，因为官网说了，这个插件现在还暂时不支持热更新。
+ 
+
+安装好之后看怎么使用，首先要在webpack中引入这个插件。首先打开线上配置文件
+ 
+
+webpack.prod.js
+```javascript
+const merge = require('webpack-merge');
+const commonConfig = require('./webpack.common.js');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+const prodConfig = {
+　　mode: 'production',
+　　devtool: 'cheap-module-source-map',
+　　module: {
+　　　　rules:[{
+　　　　　　test: /\.scss$/,
+　　　　　　use: [
+　　　　　　　　MiniCssExtractPlugin.loader,
+　　　　　　　　{
+　　　　　　　　　　loader: 'css-loader',
+　　　　　　　　　　options: {
+　　　　　　　　　　　　importLoaders: 2
+　　　　　　　　　　}
+　　　　　　　　},
+　　　　　　　　'sass-loader',
+　　　　　　　　'postcss-loader'
+　　　　　　]
+　　　　},{
+　　　　　　test: /\.css$/,
+　　　　　　use: [
+　　　　　　　　MiniCssExtractPlugin.loader,
+　　　　　　　　'css-loader',
+　　　　　　　　'postcss-loader'
+　　　　　　]
+　　　　}]
+　　},
+　　plugins:[
+　　　　new MiniCssExtractPlugin({})
+　　]
+}
+module.exports = merge(commonConfig, prodConfig);
+```
+
+然后对应到webpack.common.js里面删除css,scss相关到配置。运行npm run build。发现多出了两个文件main.css 和 main.css.map
+
+ 
+
+css打包好后，是未压缩的，要将打包好的css进行压缩，安装，optimize-css-assets-webpack-plugin
+
+
+> npm install optimize-css-assets-webpack-plugin -D
+
+在webpack.props.js引入并配置
+
+```javascript
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+　　module.exports = {
+　　　　optimization: {
+　　　　　　minimizer: [new OptimizeCSSAssetsPlugin({})],
+　　　　},
+}
+```
+
+
+运行 npm run build。会发现css文件被自动的合并压缩。
+
+
+
+还有更高级的用法， 假设有很多个css，要打包到一个css文件里面
+
+> https://webpack.js.org/plugins/mini-css-extract-plugin
+
+
+也可以实现
+
+```javascript
+optimization: {
+　　splitChunks: {
+　　　　cacheGroups: {
+　　　　　　styles: {
+　　　　　　　　name: 'styles',
+　　　　　　　　test: /\.css$/,
+　　　　　　　　chunks: 'all',
+　　　　　　　　enforce: true, // 忽略到前面到配置，不管是minSize,maxSize等等，只要是css，都打包到同一个文件中
+　　　　　　},
+　　　　},
+　　},
+},
+```
+
+
+## 4.8 webpack与浏览器缓存
+
+根据之前的配置，假设文件上传至服务器中，没有加hash，
+如果页面内容有更改，浏览器刷新的时候，请求的还是原先的文件，
+也就是浏览器的缓存，
+因为名字没有变。现在我们在上线的webpack配置中加上hash
+
+```javascript
+output:{
+　　filename: '[name].[contenthash].js',
+　　chunkFilename: '[name].[contenthash].js',
+}
+```
+
+这个时候打包出来的文件就有了hash值。只要文件内容不变，hash值就不变，内容变了才变。
+
+如果打包失效，比如老版本的webpack4。这个时候加一个配置参数
+```javascript
+optimization:{
+　　runtimeChunk: {
+　　　　name: 'runtime'
+　　}
+}
+```
+
+## 4.9 webpack中shimming的概念
+
+在webpack打包过程中会去做一些代码上的兼容，或者打包过程的兼容，比如之前使用过的babel-polyfill这个工具，
+他解决了es6代码在低版本浏览器的兼容。
+这就是webpack中的垫片。
+他解决打包过程中一些兼容性的问题。
+这些兼容性的问题不仅仅是浏览器上的兼容性问题。
+还有一些其他的兼容性问题，我们举几个例子
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+import _ from 'lodash';
+import $ from 'jquery';
+import { ui } from './jquery.ui';
+
+ui();
+
+const dom = $('<div>');
+dom.html(_.join(['1','1'],'---'));
+$('body').append(dom);
+```
+
+jquery.ui.js
+```javascript
+export function ui(){
+　　$('body').css('background', '#abcdef');
+}
+```
+
+这个时候发现ui()，没有正确的运行。报错了jquery.ui.js里面找不到$。在index.js引入了$。但是为什么jquery.ui.js里面找不到$呢？原因很简单，在
+**webpack中，是基于模块打包的。模块里面这些变量只能在这个模块的文件里面被使用。**
+
+而换了一个文件，再想使用上面文件的比那里，那是不可能的。通过这种形式，模块与模块之间不会有任何的耦合。这样出了问题，直接在自己的模块找问题就行了。不会因为一个模块而影响到另外一个模块。所以变量是隔离的。那么想要使用这个$，就必须在jquery.ui.js的顶部去引入jquery。
+
+ 
+
+那么这个jquery代码不是我的业务代码，他是第三方的库。是别人写的。所以在源码里面去加入jquery的引入是不太现实的。这个时候我们可以用一个垫片的形式来解决这个问题。在webpack.common.js里面引入webpack。webpack自带一个插件，ProvidePlugin。在这里就可以搞一点事情了。
+
+
+webpack.common.js
+```javascript
+const webpack = require('webpack');
+module.exports = {
+　　plugins: [
+　　　　// webpack自带的插件
+　　　　new webpack.ProvidePlugin({
+　　　　　　// 意思是如果我的一个模块中使用了$这样一个字符串，我就会在模块中自动的引入jquery这个
+　　　　　　$: 'jquery'
+　　　　})
+　　],
+}
+```
+
+配置好了之后，重启服务。npm run dev。那么在没有引入jquery的情况下也能用，因为底层自动引入了。这个时候我们就不需要在文件中引入_,$等
+
+ 
+
+webpack.common.js
+```javascript
+const webpack = require('webpack');
+module.exports = {
+　　plugins: [
+　　　　// webpack自带的插件
+　　　　new webpack.ProvidePlugin({
+　　　　　　// 意思是如果我的一个模块中使用了$这样一个字符串，我就会在模块中自动的引入jquery这个
+　　　　　　$: 'jquery',
+　　　　　　_: 'lodash'
+　　　　})
+　　],
+}
+```
+
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+import { ui } from './jquery.ui';
+
+ui();
+
+const dom = $('<div>');
+dom.html(_.join(['1','1'],'---'));
+$('body').append(dom);
+```
+
+jquery.ui.js
+```javascript
+export function ui(){
+　　$('body').css('background', _.join(['#abcdef'],''));
+}
+```
+
+重启服务，没问题。
+
+
+再举个例子
+```javascript
+index.html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+console.log(this === window);
+```
+
+打印出来的是false,也就是src里面的this不指向window。那我就是想让他指向window，怎么做呢？先装一个插件
+
+```javascript
+> npm install imports-loader -D
+```
+
+安装好之后再对webpack做一些配置。
+
+```javascript
+module.exports = {
+　　module: {
+　　　　rules: [{
+　　　　　　test: /\.js$/,
+　　　　　　exclude: /node_modules/,
+　　　　　　use: [{
+　　　　　　　　loader: 'babel-loader'
+　　　　　　}, {
+　　　　　　　　loader: 'imports-loader?this=>window'
+　　　　　　}],
+　　　　}
+　　}
+}
+
+```
+
+在加载js的时候多加载一个loader，叫imports-loader，将this指向window。这个时候打印出来的就是true了。说明模块里面的this就指向window了。实际上也是**修改webpack一些默认的行为。或者说实现webpack原始打包无法实现的一些效果。这种行为都叫做shimming**。垫片的行为。
+
+ 
+
+shimming这个概念很宽泛，涉及到的东西也非常多。
+
+
+## 4.10 webpack中环境变量的使用方法
+
+这节课讲解一下，在webpack打包过程中，怎么去使用一些环境变量。
+首先我有一个打包配置的三个文件
+```javascript
+"scripts": {
+　　"dev-build": "webpack --profile --json > stats.json --config ./build/webpack.dev.js",
+　　"dev": "webpack-dev-server --config ./build/webpack.dev.js",
+　　"build": "webpack --config ./build/webpack.prod.js"
+},
+```
+
+
+对应三个命令，分别是开发环境的一个命令 npm run dev。打包生成开发环境代码的命令 npm run dev-build。以及线上代码生成的一个命令 npm run build。现在我要借助两个配置文件来帮助我们去完成对应的打包，分别是dev对应配置文件和prod对应的配置文件。现在我可以通过另外一种形式来对代码进行一次变更。
+
+webpack.dev.js
+```javascript
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const commonConfig = require('./webpack.common.js');
+
+
+const devConfig = {　　
+　　mode: 'development',
+　　devtool: 'cheap-module-eval-source-map',
+　　devServer: {
+　　　　contentBase:'./dist',
+　　　　open:true,
+　　　　hot: true
+　　},
+　　plugins: [
+　　　　new webpack.HotModuleReplacementPlugin()
+　　],
+　　output: {
+　　　　filename: '[name].js',
+　　　　chunkFilename: '[name].chunk.js',
+　　}
+}
+module.exports = merge(commonConfig, devConfig);
+```
+
+
+这是dev配置原始文件，其中引入了merge和commonConfig。现在我把他删掉，直接导出devConfig
+
+webpack.dev.js
+```javascript
+const webpack = require('webpack');
+const devConfig = {
+}
+module.exports = devConfig;
+```
+
+
+prod也做同样的处理，这样我导出的就不是融合过后的文件。而是自己独立的配置文件。接着我们打开webpack.common.js，去引入merge，dev和prod
+ 
+webpack.common.js
+
+```javascript
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const webpack = require('webpack');
+const merge = require('webpack-merge');
+const devConfig = require('./webpack.dev');
+const prodConfig = require('./webpack.prod');
+
+
+const commonConfig = {
+}
+
+
+module.exports = (env) => {
+　　// 如果有这个全局变量，且是线上环境，否则是开发环境
+　　if(env && env.production) {
+　　　　return merge(commonConfig, prodConfig);
+　　} else {
+　　　　return merge(commonConfig, devConfig);
+　　}
+}
+```
+
+以前我们导出一个对象，这里我们导出一个函数，接收一个全局变量，怎么融合取决于传递进来的变量。是否有全局变量，是哪个环境决定
+
+package.json
+```javascript
+"scripts": {
+　　"dev-build": "webpack --profile --json > stats.json --config ./build/webpack.common.js",
+　　"dev": "webpack-dev-server --config ./build/webpack.common.js",
+　　"build": "webpack --env.production --config ./build/webpack.common.js"
+},
+```
+
+package.json里面走的都是webpack.common.js了。在build里面加入--env.production。其他不加默认走devConfig。各自运行。没问题。这样就不是通过不同的文件，而是都是走common，通过变量控制
+
+
+## 五 Webpack 实战配置案例讲解
+
+## 5.1 webpack中第三方库library的打包
+之前都是对自己写的业务代码进行打包，但假设我们要开发一个库，这样的库代码如何用webpack进行打包呢，首先我们创建一个非常简单的函数库
+ 
+
+首先新建一个文件夹library，运行npm init -y，得到一个package.json
+package.json
+```javascript
+{
+　　"name": "library",
+　　"version": "1.0.0",
+　　"description": "",
+　　"main": "index.js",
+　　"scripts": {
+　　},
+　　"keywords": [],
+　　"author": "",
+　　"license": "MIT"
+}
+```
+
+然后library下新建一个src,里面建三个文件,math.js,string.js,index.js
+
+math.js
+```javascript
+export function add(a,b) {
+　　return a + b;
+}
+
+export function minus(a,b) {
+　　return a - b;
+}
+
+export function cheng(a,b) {
+　　return a * b;
+}
+
+export function chu(a,b) {
+　　return a / b;
+}
+```
+
+string.js
+```javascript
+export function join(a, b){
+　　return a + '' + b;
+}
+```
+
+index.js
+```javascript
+import * as math from './math';
+import * as string from './string';
+
+export default { math, string }
+```
+
+然后安装webpack
+> npm install webpack webpack-cli --save
+
+新建配置文件 webpack.common.js
+webpack.common.js
+```javascript
+const path = require('path');
+
+module.exports = {
+　　mode: 'production',
+　　entry: './src/index.js',
+　　output: {
+　　　　path: path.resolve(__dirname, 'dist'),
+　　　　filename: 'library.js'
+　　}
+}
+```
+
+package.json里面配置script
+```javascript
+"scripts": {
+　　"build": "webpack"
+},
+```
+
+然后运行 npm run build。生成一个dist文件夹，里面生成了一个library.js。如果是我们业务代码，就好了。但是我们生成的是一个库，给别人用的，那么别人怎么用呢
+
+第一种
+
+import library from 'library';
+第二种
+const library = require('library');
+第三种
+
+require(['library'],function() {
+})
+如果我们的库想外面可以被这样引用。可以做一个配置,webpack.config.js里面output多加一个参数
+webpack.common.js
+```javascript
+const path = require('path');
+module.exports = {
+　　mode: 'production',
+　　entry: './src/index.js',
+　　output: {
+　　　　path: path.resolve(__dirname, 'dist'),
+　　　　filename: 'library.js',
+　　　　// 通过任何形式，都可以引用的到
+　　　　libraryTarget: 'umd'
+　　}
+}
+```
+
+除了这种引用之外，我还希望别人通过引用srcipt后，可以通过全局变量来使用这个库
+
+<script src='library.js'></script>
+library.add();
+再配置一下webpack.config.js
+
+```javascript
+const path = require('path');
+
+module.exports = {
+　　mode: 'production',
+　　entry: './src/index.js',
+　　output: {
+　　　　path: path.resolve(__dirname, 'dist'),
+　　　　filename: 'library.js',
+　　　　// 打包生成的代码挂载到页面到一个全局变量上
+　　　　library: 'library',
+　　　　// 通过任何形式，都可以引用的到
+　　　　libraryTarget: 'umd'
+　　}
+}
+```
+
+接下来我们做一个测试，在生成好的dist目录下新建index.html
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>Document</title>
+　　　　<script src="./library.js"></script>
+　　</head>
+　　<body>
+　　</body>
+</html>
+```
+
+然后运行这个页面，控制台调用library;
+
+ 
+
+除了在打包库的时候，我们要额外的配置这两个参数之外呢，我们还要做一件事情。比如string.js
+string.js
+```javascript
+export function join(a, b){
+　　return a + '' + b;
+}
+```
+
+在写的时候发现lodash里面有个功能很好
+
+> npm install lodash --save
+
+
+string.js
+```javascript
+import _ from 'lodash';
+
+export function join(a, b){
+　　return _.join([a,b], ' ');
+}
+```
+
+然后现在看起来没有问题，但是别人使用我们的库的时候，他也有可能重新使用了lodash。这就导致一个问题，我们的库里面打包了一次lodash，用户的业务代码里面又打包了一次lodash。所以用户的业务代码里面就容易存在两份lodash代码。为了解决这个问题，我们需要在库里面做一个另外的配置，externals
+```javascript
+const path = require('path');
+
+module.exports = {
+　　mode: 'production',
+　　entry: './src/index.js',
+　　// 如果打包过程中遇到lodash，就忽略这个库，不要打包到代码里面去
+　　externals: ['lodash'],
+　　output: {
+　　　　path: path.resolve(__dirname, 'dist'),
+　　　　filename: 'library.js',
+　　　　// 打包生成的代码挂载到页面到一个全局变量上
+　　　　library: 'library',
+　　　　// 通过任何形式，都可以引用的到
+　　　　libraryTarget: 'umd'
+　　}
+}
+```
+
+这个时候外面直接使用library就不可以了，因为库里面要用lodash。所以在用这个库的时候，业务代码里面要另外引入lodash。
+
+现在我们看下externals的作用
+```javascript
+externals : {
+　　lodash : {
+　　　　commonjs: 'lodash',
+　　}
+},
+```
+
+这个意思是。如果lodash这个库在commonjs环境下被使用，lodash加载的时候，名字必须是lodash
+```javascript
+const lodash = require('lodash');
+
+externals : {
+　　lodash : {
+　　　　root: '_',
+　　　　commonjs: 'lodash',
+　　}
+},
+```
+
+这个时候加一个root。这个意思是如果既不使用commonjs，也不使用es module。更不用amd形式去引入lodash。这个lodash是通过js引入的，这里要求这个script标签必须注入一个叫做'_'的全局变量。但是一般来说没有特殊要求，直接配置成
+
+就可以了，他的意思是不管任何环境下，引入lodash都叫做lodash。
+
+ 
+
+最终我们给别人使用的是最后的library,那怎么样让别人方便的使用到呢？
+首先把package.json里面的入口文件配置改成
+
+然后npm里面注册一个账号。登录后在命令行输入
+> npm adduser
+
+输入账号密码后，直接输入
+> npm publish
+
+成功后，别人利用npm install library就可以用你的了
+
+
+
+
+## 5.2 webpack中PWA的配置
+
+PWA: Progressive Web Application
+是一门比较新的前端技术
+ 
+index.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```javascript
+console.log('HELLO WORLD');
+```
+
+打包好生成一个dist，dist下面是要传到服务器上面到东西。我们没有服务器，但可以模拟。安装
+>   npm install http-server --save
+
+```javascript
+"scripts": {
+　　"start": "http-server dist",
+　　"dev": "webpack-dev-server --config ./build/webpack.common.js",
+　　"build": "webpack --env.production --config ./build/webpack.common.js"
+},
+```
+
+
+他的意思是在dist目录下开启http-server。也就是我让打包生成的，即将运行到线上的dist代码在一台服务器下启动起来。
+然后运行 npm run start。
+会启动一台服务，在http://127.0.0.1:8080。
+打开localhost:8080。就能看到控制台打印出了hello world。
+ 
+
+这是传统情况下，我们写了一段代码，然后运行在浏览器的一个效果。
+ 
+
+这个时候退出这台服务，浏览器就直接不能访问了，那么
+
+**pwa是什么技术呢？第一次访问成功了，突然之间服务器挂掉了，第二次重新访问这个网站的时候，他可以在你的本地有一份缓存，你可以用这个缓存，把之前的页面再展示出来。所以即便服务器挂掉，我还是可以看到之前的页面**。
+ 
+
+webpack有一个插件，可以非常方便的实现这个pwa的技术。
+>   npm install workbox-webpack-plugin --save-dev
+ 
+
+只有要上线的代码才需要pwa的处理，打开webpack.prod.js
+webpack.prod.js
+```javascript
+const WorkboxPlugin = require('workbox-webpack-plugin');
+module.exports = {
+　　plugins:[
+　　　　new MiniCssExtractPlugin({
+　　　　　　filename: '[name].css',
+　　　　　　chunkFilename: '[name].chunk.css'
+　　　　}),
+　　　　new WorkboxPlugin.GenerateSW({
+　　　　　　clientsClaim: true,
+　　　　　　skipWaiting: true
+　　　　})
+　　],
+}
+```
+
+重新打包,dist目录会新生成两个文件，一个是service-worker.js，一个是precache-maifest.js。这两个文件就可以让service-work生效。
+最后业务代码还需要再更改下
+index.js
+```javascript
+console.log('HELLO WORLD');
+
+if('serviceWorker' in navigator) {
+　　window.addEventListener('load', ()=>{
+　　　　navigator.serviceWorker.register('/service-worker.js').then(register=>{
+　　　　　　console.log('service-worker register');
+　　　　}).catch(error=>{
+　　　　　　console.log('service-worker register error');
+　　　　})
+　　})
+}
+```
+
+重新打包。运行index.html，然后断开服务，hello world还是一直在的。
+
+## 5.3 webpack中typeScript的打包配置
+2018年typescript发展的非常好，js是一门非常灵活的语言，所以一个功能，怎么写都能够写出来，但是这也会导致一个问题，不同人写js的方式不同，那么会导致同一个功能出现的代码风格会迥然不同。这样的话，如果是一个团队在做编程的过程中，每个人都按自己的语法去写代码的话，那么维护性就难以得到保证。
+ 
+typescript是微软推出的一个产品，他规范了一套javascript的语法，当然他也支持原始的javascript语法。通过typescript最大的优势就是可以规范我们的代码。
+ 
+同时typescript因为把我们的代码做了规范，也可以方便的对代码进行报错，提示。所以我们代码写的不规范，会及时的提示给我们。
+所以总体来说，用typescript来编写我们的代码。可以有效的提升我们js的可维护性。
+这也是为什么越来越多的公司开始采用typescript的原因，如果使用typescript，对应打包的webpack配置就会有所差异。
+
+所以我们看看webpack怎么对typescript进行打包支持。新建一个项目， 初始化package.json，安装webpack。typescript的后缀是index.tsx
+
+
+index.tsx
+```typescript
+class Greeter {
+　　greeting: string;
+　　constructor(message: string) {
+　　　　this.greeting = message;
+　　}
+　　greet() {
+　　　　return "Hello, " + this.greeting;
+　　}
+}
+
+let greeter = new Greeter("world");
+
+alert(greeter.greet())
+```
+
+这段代码是官网的例子http://www.typescriptlang.org/play/index.html。这段代码直接在浏览器里是运行不起来的。需要通过编译，webpack进行配置
+安装
+>   npm install ts-loader typescript --save-dev
+
+webpack.config.js
+```javascript
+const path = require('path');
+module.exports = {
+　　mode: 'production',
+　　entry: './src/index.tsx',
+　　module: {
+　　　　rules: [{
+　　　　　　test: /\.tsx?$/,
+　　　　　　// ts-loader是官方提供的处理tsx的文件
+　　　　　　use: 'ts-loader',
+　　　　　　exclude: /node_modules/
+　　　　}]
+　　},
+　　output: {
+　　　　filename: 'bundle.js',
+　　　　path: path.resolve(__dirname, 'dist')
+　　}
+}
+```
+
+package.json
+```javascript
+"scripts": {
+　　"build": "webpack"
+},
+```
+
+运行npm run build。这样是否打包成功了，打包试试，发现报错了，如下
+
+![typescipt-build-error](https://img2018.cnblogs.com/blog/331769/201905/331769-20190516070239608-952114919.png)
+
+提示说缺少一个tsconfig.json文件。
+
+tsconfig.json
+```javascript
+{
+　　"compilerOptions": {
+　　　　"outDir": "./dist", // 这块写不写都可以，webpack.config.js里面已经配置了output
+　　　　"module": "es6", // 指的是用的es module的引入方式
+　　　　"target": "es5", // 指的是打包成es5代码
+　　　　"allowJs": true, // 允许tsx引入js文件
+　　}
+}
+```
+
+配置好之后，再运行npm run build。发现打包成功了，出现了dist,bundle.js。这个时候将bundle.js复制到控制太，能弹出hello world。说明打包生成的文件没有任何问题。
+
+
+
+
+用typescript有什么好处
+1、Greeter里面必须传一个字符串的内容，但假设传递123。在代码里就会报错。使用ts后，代码就更严谨了。就可以使我们的代码有效的避免一些错误。**更严谨规范的写代码**。
+2、我安装了lodash。在tsx里面import _ from 'lodash';发现报错了，我们需要安装lodash对应的ts类型文件。
+>   npm install @types/lodash --save-dev
+
+
+意思是去ts里面使用lodash。这个时候在tsx里面提示不能直接引入。ts里面去引入需要 import * as _ from 'lodash' 去引入所有的内容
+
+index.tsx
+```typescript
+import * as _ from 'lodash';
+
+class Greeter {
+　　greeting: string;
+　　constructor(message: string) {
+　　　　this.greeting = message;
+　　}
+　　greet() {
+　　　　return _.join(['Hello,',this.greeting], '');
+　　}
+}
+
+let greeter = new Greeter('world');
+
+alert(greeter.greet())
+```
+
+
+所以在写ts的时候，**在写代码的时候就会报错，从而更快的发现问题。**
+
+3、我怎么知道哪些库有对应的ts,types呢
+
+https://microsoft.github.io/TypeSearch/
+在这个网址去搜索，有的话就可以安装相应的文件模块的名字。**@types/...**
+
+
+## 5.4 webpack中使用WebpackDevServer实现请求转发
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+index.js
+```typescript jsx
+import React, {Component} from 'react';
+import ReactDom from 'react-dom';
+import axios from 'axios';
+
+class App extends Component{
+　　render() {
+　　　　return (
+　　　　　　<div>hello world</div>
+　　　　)
+　　}
+　　componentDidMount(){
+　　　　axios
+　　　　　　.get('/react/api/header.json')
+　　　　　　.then((res)=>{
+　　　　　　　　console.log(res);
+　　　　　　})
+　　}
+}
+ReactDom.render(<App/>, document.getElementById('root'));
+```
+
+使用 npm run dev ("webpack-dev-server --config ./build/webpack.common.js")打包进行开发。
+这个时候这个接口会报错。因为localhost下面没有这个接口，那我们去请求线上的（在对方服务器允许我们跨域的时候）。
+我们看webpack怎么配置https://webpack.js.org/configuration/dev-server#devserverproxy。可以看到dev下面有个devServer:proxy的配置项。
+通过这个配置项就可以很方便进行本地接口的调试
+
+
+```javascript
+module.exports = {
+　　devServer: {
+　　　　contentBase:'./dist',
+　　　　open:true,
+　　　　hot: true,
+　　　　proxy: {
+　　　　　　'/react/api': 'http://www.xxx.com'
+　　　　}
+　　}
+}
+```
+
+
+
+配置一个proxy。意思是在/react/api下面的接口走的都是http://www.xxx.com的/react/api接口。
+
+但是如果这个线上的接口没有好，需要用假数据。后端给了一个demo.json的临时数据用，可以这么配置
+
+```javascript
+module.exports = {
+　　devServer: {
+　　　　contentBase:'./dist',
+　　　　open:true,
+　　　　hot: true,
+　　　　proxy: {
+　　　　　　'/react/api': {
+　　　　　　　　target: 'http://www.xxx.com',
+　　　　　　　　pathRewrite: {
+　　　　　　　　　　'header.json': 'demo.json'
+　　　　　　　　}
+　　　　　　}
+　　　　}
+　　}
+}
+```
+
+这个的意思是，如果用户请求/react/api下的接口时，首先会到www.xxx.com下面去拿数据，但拿数据的时候他还有些规则，如果拿的是header.json的数据，其实不是拿header.json下的数据，而是demo.json的数据。
+
+ 
+
+最后这个proxy是devServer的proxy，这就意味着只有在开发环境下，我们对proxy的配置才会生效，因为只有开发环境下才会使用。如果这个网址是https的时候，需要加个配置支持，secure:false
+
+```javascript
+module.exports = {
+　　devServer: {
+　　　　contentBase:'./dist',
+　　　　open:true,
+　　　　hot: true,
+　　　　proxy: {
+　　　　　　'/react/api': {
+　　　　　　　　target: 'https://www.xxx.com',
+　　　　　　　　secure: false
+　　　　　　}
+　　　　}
+　　}
+}
+```
+
+这里我们只讲了一个路径，/react/api，如果有多个路径怎么办呢，可以放在context里面去管理
+
+```javascript
+module.exports = {
+　　devServer: {
+　　　　proxy: [{
+　　　　　　context: ['/auth', '/api'],
+　　　　　　target: 'http://localhost:3000',
+　　　　}]
+　　}
+};
+```
+他的意思是你访问 /auth 或者 /api 这个路径的时候，都会代理到localhost:3000这个域名下。
+
+ 
+
+除了这些，还有一些其他的配置。https://github.com/chimurai/http-proxy-middleware#options
+ 
+ 
+## 5.5 webpack解决单页面路由问题
+
+index.html
+```
+<!DOCTYPE html>
+<html lang="en">
+　　<head>
+　　　　<meta charset="UTF-8">
+　　　　<meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　　　<meta http-equiv="X-UA-Compatible" content="ie=edge">
+　　　　<title>html template</title>
+　　</head>
+　　<body>
+　　　　<div id='root'></div>
+　　</body>
+</html>
+```
+
+
+index.js
+
+```
+import React, {Component} from 'react';
+import { BrowserRouter, Route } from 'react-router-dom';
+import ReactDom from 'react-dom';
+import Home from './home';
+import List from './list';
+
+class App extends Component{
+　　render() {
+　　　　return (
+　　　　　　<BrowserRouter>
+　　　　　　　　<div>
+　　　　　　　　　　<Route path='/' exact component={Home} />
+　　　　　　　　　　<Route path='/list' component={List} />
+　　　　　　　　</div>
+　　　　　　</BrowserRouter>
+　　　　)
+　　}
+}
+ReactDom.render(<App/>, document.getElementById('root'));
+```
+home.js
+
+```
+import React, {Component} from 'react';
+
+class Home extends Component{
+　　render() {
+　　　　return (
+　　　　　　<div>home</div>
+　　　　)
+　　}
+}
+
+export default Home;
+```
+list.js
+
+```
+import React, {Component} from 'react';
+
+class List extends Component{
+　　render() {
+　　　　return (
+　　　　　　<div>list</div>
+　　　　)
+　　}
+}
+
+export default List;
+```
+ 
+
+ 
+
+我们运行npm run dev ("webpack-dev-server --config ./build/webpack.common.js")。访问localhost:8080/访问没有问题，访问localhost:8080/list说找不到这个页面，这是为什么。
+ 
+
+原因是当你这么去访问一个网址的时候，后端，也就是现在的webpackDevServer会因为访问的是后端的一个list页面。但是我们dist下只有index.html，并没有list这个页面。所以提示页面不存在，这是前端做单页应用的时候经常会遇到的一个问题。在webpackDevServer里面要解决这个问题，打开webpack官网。https://webpack.js.org/configuration/dev-server#devserverhistoryapifallback
+我们这里只要配置一个historyApiFallback就可以了
+module.exports = {
+　　devServer: {
+　　　　historyApiFallback: true
+　　}
+};
+这样我们重新访问localhost:8080/list的时候就没有问题了。他的原理是后端服务器如果发现并没有这个/list地址。就会偷摸的转化成根路径的请求，所以不管请求什么地址，都会请求index.html，里面有main.js，也就是我们的业务代码，这里面的路由就能正常的生效。
+ 
+
+这里面还可以有其他的配置
+historyApiFallback: {
+　　rewrites: [
+　　　　{ from: /abc.html/, to: '/index.html' },
+　　]
+},
+这里面如果访问的是abc.html的时候，转化成index.html。所以这里填一个true，等价于from任何路劲，都to到index.html上。
+ 
+ 
+ ## 5.6 webpack中配置eslint
+ 首先安装eslint
+ npm install eslint --save-dev
+ 安装好这个工具后,初始化eslint
+ npx eslint --init
+ 这个时候会自动生成.eslintrc.js
+  
+ 
+ 然后去配置eslint,检测react
+ 安装
+  npm install babel-eslint --save-dev
+  
+ 
+  
+ 
+ 配置好规范之后
+ 执行 npx eslint src，就会报出相应的错误信息
+ 或者
+ vscode，安装eslint，会自动提示不对的书写方式
+  
+ 
+ 用webpack配置eslint
+ 首先安装 
+ npm install eslint-loader --save-dev
+  
+ 
+ ```
+ module.exports = {
+ 　　module: {
+ 　　　　rules: [{
+ 　　　　　　test: /\.js$/,
+ 　　　　　　// 如果你的这个js文件在node_modules里面，就不使用babel-loader了
+ 　　　　　　exclude: /node_modules/,
+ 　　　　　　use: ['babel-loader', 'eslint-loader'],
+ 　　　　}]
+ 　　}
+ }
+ ```
+ 然后运行 npm run dev，就会将不标准的写法呈现在命令行，在devServer里面设置overlay: true,就会在浏览器之际弹出错误，哪怕编辑器没有eslint也会报错。
+  
+ 
+ 真实项目中，一般不会在webpack中配置eslint，会降低性能。
+ 
+## 5.7webpack性能优化
+ 我们在打包的时候需要耗费非常多的时间，所以在一些大型项目的时候需要提升webpack的打包效率。
+ 1、跟上技术的迭代（node,npm,yarn）
+ 　升级webpack，node，npm，yarn的版本。新的版本会做优化
+  
+ 2、在尽可能少的模块上应用Loader
+ 比如曾经有个功能将this指向window的功能
+ rules:[{
+ 　　use:[{
+ 　　　　loader: 'imports-loader?this=>window'
+ 　　}]
+ }]
+ 这个时候可以把他干掉，作用不大。
+ 比如js打包一定要加exclude:/node_modules/
+```
+ rules:[{
+ 　　test:/\.js$/,
+ 　　exclude:/node_modules/
+ 　　use:[[
+ 　　　　loader:'babel-loader'
+ 　　]]
+ }]
+```
+ node_modules的第三方模块都是编译过，不需要二次打包，合理使用exclude,include
+ 
+  
+ 3、尽可能少的使用plugin，同时确保plugin的可靠性。
+```
+ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+ 
+ module.exports = {
+ 　　plugins:[
+ 　　　　new MiniCssExtractPlugin({})
+ 　　]
+ }
+```
+ 比如上线的时候使用OptimizeCSSAssetsPlugin，压缩css的插件。希望在打包生成代码的时候，如果我引入了css文件，那么把css文件打包到dist目录下。而不是直接引入到js文件里面。如果是开发环境，就不需要使用这个插件，不对代码进行压缩，就节约了代码打包压缩的时间。所以插件尽量使用官方的插件，官方的插件是经过官网测试的，在自己引用第三方插件的时候，也需要是社区里经过测试的。可以有效提升webpack打包速度。
+  
+ 4、resolve参数合理配置
+ 比如我们之前引入一个js文件的时候，是这样的，import Child from '../child/child'。
+ 后面没有加js后缀也可以引入。在一开始的时候是不支持这样引入的。可以引入是因为webpack下有这么一段代码
+ resolve: {
+ 　　extensions: ['./js', '.jsx']
+ }
+ 当看到resolve可以这么配，就想好多东西都配置在这里
+ resolve: {
+ 　　extensions: ['./css', './jpg', './js', '.jsx']
+ }
+ 这样就意味着很多次查找，每次查找的时候一般会损耗性能的。一般js,jsx的时候配置resolve，其他手动写后缀去引入。
+ 
+  
+ 
+ resolve还有其他的用法，比如src/child/child这样引入。import Child from './child/'这样也可以引入child.js文件，本身这样引入是不行的，如果把child.js改成index.js也可以，但是现在是child.js，不是index.js怎么弄
+ resolve: {
+ 　　extensions: ['./js', '.jsx'],
+ 　　mainFiles: ['index', 'child']
+ }
+ 他的意思是引入某个目录下不知道什么文件的时候，首先会先尝试去找index文件，如果index文件不存在再去找child文件。这样额外配置resolve里面的内容也会有影响，一般我们不这样配。
+ 
+  
+ resolve还有其他的配置项。比如alias，当文件比较深的时候可以引入
+ resolve: {
+ 　　alias: {
+ 　　　　child: path.resolve(__dirname, '../src/a/b/c')
+ 　　}
+ }
+ 在文件中直接 import Child from 'child/xxx.js'就可以了。
+  
+ 5、使用DllPlugin提高打包速度
+ index.js
+```
+ import React, {Component} from 'react';
+ import { BrowserRouter, Route } from 'react-router-dom';
+ import ReactDom from 'react-dom';
+ import _ from 'lodash';
+ 
+ class App extends Component{
+ 　　render() {
+ 　　　　return (
+ 　　　　　　<BrowserRouter>
+ 　　　　　　　　<div>
+ 　　　　　　　　　　{_.join(['this','is','app'], ' ')}
+ 　　　　　　　　</div>
+ 　　　　　　</BrowserRouter>
+ 　　　　)
+ 　　}
+ }
+ ReactDom.render(<App/>, document.getElementById('root'));
+```
+ 像lodash这样的第三方模块加进去后，大概打包多了一百多ms。像这种代码不会变多第三方模块，我们不必每次都去打包分析，第二次直接用第一次分析好多结果就好了。首先建立一个webpack.dll.js
+ 
+ webpack.dll.js
+```
+ const path = require('path');
+ module.exports = {
+ 　　mode: 'production',
+ 　　entry:{
+ 　　　　vendors: ['react', 'react-dom', 'lodash']
+ 　　},
+ 　　output:{
+ 　　　　filename: '[name].dll.js',
+ 　　　　path: path.resolve(__dirname, '../dll'),
+ 　　　　// 通过一个全局变量暴露出去，全局变量叫做vendors
+ 　　　　library: '[name]'
+ 　　}
+ }
+```
+ 然后配置文件增加一个
+ 
+ "scripts": {
+ 　　"build:dll": "webpack --config ./build/webpack.dll.js"
+ },
+ 然后我们打包好了一个叫做vendors.dll.js的文件。怎么引用，我们把vendors.dll.js植入到index.html里面，就可以全局引入vendors这个变量
+ 
+ 
+ 安装一个插件， 
+ npm install add-asset-html-webpack-plugin --save
+ 顾名思义就是在html里面去增加一些静态的资源.安装好后，配置webpack.common.js
+```
+ const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin');
+ plugins: [
+ 　　// filepath表示要增加到文件是哪些
+ 　　new AddAssetHtmlWebpackPlugin({
+ 　　　　filepath: path.resolve(__dirname, '../dll/vendors.dll.js')
+ 　　})
+ ],
+```
+ 然后运行npm run dev ("webpack-dev-server --config ./build/webpack.common.js")。打开控制台，可以看到已经引入了vendors.dll.js。也有了vendors这个全局变量。
+ 
+ 
+ 到了这一步，离目标近了一步。我们到目标是第三方模块只打包一次。现在我们打包好了第三方模块，可以被使用。但还没有被使用的这一步。接下来我们看怎么使用第三方模块。
+ webpack.dll.js
+```
+ const path = require('path');
+ const webpack = require('webpack');
+ module.exports = {
+ 　　plugins: [
+ 　　　　// 用这个插件分析这个库，把库里面一些第三方模块的映射关系放到了dll下面的vendors.mainfest.json
+ 　　　　new webpack.DllPlugin({
+ 　　　　　　name: '[name]',
+ 　　　　　　path: path.resolve(__dirname, '../dll/[name].manifest.json')
+ 　　　　})
+ 　　]
+ }
+```
+ webpack.common.js
+ 
+```
+ module.exports = {
+ 　　plugins: [
+ 　　　　/**
+ 　　　　* 使用这个插件，当打包index.js的时候，会引入一些第三方模块，当发现第三方模块的时候，会去manifest去找映射关系
+ 　　　　* 找到就不用再重新分析打包了，去vendors这个全局变量找就好了
+ 　　　　* 不在第三方模块，才会去分析
+ 　　　　*/
+ 　　　　new webpack.DllReferencePlugin({
+ 　　　　　　manifest: path.resolve(__dirname, '../dll/vendors.manifest.json')
+ 　　　　})
+ 　　],
+ }
+```
+  
+ 
+ 然后重新打包，看到之前时间是1500ms左右，现在是1100ms左右。 我们也可以对打包的webpack.dll.js进行拆分
+```
+ const path = require('path');
+ const webpack = require('webpack');
+ 
+ module.exports = {
+ 　　mode: 'production',
+ 　　entry:{
+ 　　　　vendors: ['lodash'],
+ 　　　　react: ['react', 'react-dom']
+ 　　},
+ 　　output:{
+ 　　　　filename: '[name].dll.js',
+ 　　　　path: path.resolve(__dirname, '../dll'),
+ 　　　　// 通过一个全局变量暴露出去，全局变量叫做vendors
+ 　　　　library: '[name]'
+ 　　},
+ 　　plugins: [
+ 　　　　// 用这个插件分析这个库，把库里面一些第三方模块的映射关系放到了dll下面的vendors.mainfest.json
+ 　　　　new webpack.DllPlugin({
+ 　　　　　　name: '[name]',
+ 　　　　　　path: path.resolve(__dirname, '../dll/[name].manifest.json')
+ 　　　　})
+ 　　]
+ }
+```
+  
+ 
+ 再执行npm run build:dll（"build:dll": "webpack --config ./build/webpack.dll.js"）。生成了vendors.dll.js和react.dll.js两个文件。同时webpack.commmon.js也要增加新增的文件
+```
+ module.exports = {
+ 　　plugins: [
+ 　　　　new AddAssetHtmlWebpackPlugin({
+ 　　　　　　filepath: path.resolve(__dirname, '../dll/vendors.dll.js')
+ 　　　　}),
+ 　　　　new AddAssetHtmlWebpackPlugin({
+ 　　　　　　filepath: path.resolve(__dirname, '../dll/react.dll.js')
+ 　　　　}),
+ 　　　　new webpack.DllReferencePlugin({
+ 　　　　　　manifest: path.resolve(__dirname, '../dll/vendors.manifest.json')
+ 　　　　}),
+ 　　　　new webpack.DllReferencePlugin({
+ 　　　　　　manifest: path.resolve(__dirname, '../dll/react.manifest.json')
+ 　　　　})
+ 　　]
+ }
+```
+ 那如果在大型项目中，dll文件就会非常的多，在plugins里面也要不断的加dll.js和mainfest.json。我们这样做个优化
+ 
+ 
+ 把基础的plugins提取出来
+```
+ const plugins = [
+ 　　// HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+ 　　new HtmlWebpackPlugin({
+ 　　　　template: 'src/index.html'
+ 　　}),
+ 　　new CleanWebpackPlugin()
+ ]
+```
+ 接着通过node分析dll下有几个dll文件，有几个mainfest.json文件。然后动态的往plugins里面添加这个AddAssetHtmlWebpackPlugin和DllReferencePlugin。
+```
+ // 引入node fs
+ const fs = require('fs');
+ // 读取dll文件的所有文件名
+ const files = fs.readdirSync(path.resolve(__dirname, '../dll'));
+ const plugins = [
+ 　　// HtmlWebpackPlugin会在打包结束后，自动生成一个html文件，并把打包生成的js自动引入到这个html文件中
+ 　　new HtmlWebpackPlugin({
+ 　　　　template: 'src/index.html'
+ 　　}),
+ 　　new CleanWebpackPlugin()
+ ];
+ 
+ // 读取dll文件的所有内容
+ const files = fs.readdirSync(path.resolve(__dirname, '../dll'));
+ 
+ files.forEach(file =>{
+ 　　// // filepath表示要增加到文件是哪些
+ 　　if(/.*\.dll.js/.test(file)) {
+ 　　　　plugins.push(new AddAssetHtmlWebpackPlugin({
+ 　　　　　　filepath: path.resolve(__dirname, '../dll', file)
+ 　　　　}))
+ 　　}
+ 　　// /**
+ 　　// * 使用这个插件，当打包index.js的时候，会引入一些第三方模块，当发现第三方模块的时候，会去mainfest去找映射关系
+ 　　// * 找到就不用再重新分析打包了，去vendors这个全局变量找就好了
+ 　　// * 不在第三方模块，才会去分析
+ 　　// */
+ 　　if(/.*\.manifest.json/.test(file)){
+ 　　　　plugins.push(new webpack.DllReferencePlugin({
+ 　　　　　　manifest: path.resolve(__dirname, '../dll', file)
+ 　　　　}))
+ 　　}
+ })
+```
+ 6、控制包文件大小(tree shaking, splitChunks)
+ 7、thread-loader,parallel-webpack,happypack多进程打包
+ 8、合理使用sourceMap，soureMap越详细，打包速度越慢
+ 9、结合stats，打包分析工具分析打包结果
+ 10、开发环境内存编译(devServer，内存的读取比硬盘读取快)
+ 11、开发环境无用插件剔除（比如开发环境，mode不要用production）
